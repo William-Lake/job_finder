@@ -49,7 +49,7 @@ When executing `job_finder`:
 
 The database used for this project is sqlite. The included Create_DB.sql script shows the current database structure.
 
-Instead of a auto-generated id for jobs in the job table, I instead opted to generate a hashcode using all the job data. I'm certain this isnt' the best way, but it's what I went with at the time.
+Instead of an auto-generated id for jobs in the job table, I instead opted to generate a hashcode using all the job data. I'm certain this isnt' the best way, but it's what I went with at the time.
 
 ## TODO
 
@@ -68,3 +68,4 @@ This repo currently only gathers State of Montana IT Jobs. It would be useful to
 
 Additionally, it will likely be useful at some point to provide a web interface to display the currently gathered jobs.
 
+[This list](https://github.com/toddmotto/public-apis#jobs) has some potentially useful apis that could help with this.
