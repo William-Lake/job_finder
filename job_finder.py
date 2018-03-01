@@ -16,6 +16,7 @@ import sqlite3
 from db_connection import db_connection
 from job import job
 from recipient import recipient
+from job_emailer import job_emailer
 
 class job_finder(object):
 
@@ -23,6 +24,8 @@ class job_finder(object):
 		"""Constructor"""
 
 		self.db_conn = db_connection()
+
+		self.mailer = job_emailer()
 
 		self.load_recipients()
 

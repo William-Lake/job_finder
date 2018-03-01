@@ -53,8 +53,11 @@ Instead of an auto-generated id for jobs in the job table, I instead opted to ge
 
 ## TODO
 
-- Review current job id hashcode method, consider changing it.
-- At the moment there isn't any process for notifying recipients. A method exists in recipient.py, but it doesn't do anything. The original idea was to send an email. I currently have a [gist saved](https://gist.github.com/William-Lake/6eb8d8f5b08e0251b5df3589ead788a4) re: how to complete this but I'm uncertain if it's the best way. *This needs to be resolved.*
+- ~~Review current job id hashcode method, consider changing it.~~
+    - This works fine.
+- ~~At the moment there isn't any process for notifying recipients. A method exists in recipient.py, but it doesn't do anything. The original idea was to send an email. I currently have a [gist saved](https://gist.github.com/William-Lake/6eb8d8f5b08e0251b5df3589ead788a4) re: how to complete this but I'm uncertain if it's the best way. *This needs to be resolved.*~~
+    - See job_emailer.py
+    - **Currently undergoing testing, not working at the moment.**
 - Once the email notification issue has been resolved, the idea is to drop everything onto a web server and set up a cronjob to execute the job_finder script nightly.
     - [Potentially useful gist](https://gist.github.com/William-Lake/f50758f07a28f097fda78172379ecb63)
 - When this all gets set up on a web server, will need a web service/input page to handle gathering the user's email and adding it to the database- *after verifying they are allowed to do so.*
