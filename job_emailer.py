@@ -49,19 +49,20 @@ class job_emailer(object):
         # Assumed for now, no current plans to send emails with anything else.
         self.text_subtype = 'plain'
 
-    def notify_recipients_of_job(self,recipients,job):
+    def notify_recipients_of_job(self,recipients,job,is_new=True):
         """Notifies the given list of recipients of the given job.
         
         Arguments:
             recipients {list} -- The list of recipients to notify.
             job {job} -- The job to notify the recipients of.
         """
+        self.is_new = is_new
 
         self.job = job
 
         self.recipients = recipients
 
-        self.creat_email_body()
+        self.create_email_body()
 
         self.gather_recipient_emails()
 
@@ -69,10 +70,12 @@ class job_emailer(object):
 
         self.send_email()
 
-    def creat_email_body(self):
+    def create_email_body(self):
         """Creates the email body using the data from the job object."""
 
-        self.msg_data = 'NEW JOB\n'
+        if self.is_new: self.msg_data = 'NEW JOB\n'
+
+        else self.msg_data = 'JOB CLOSED\n'
 
         self.msg_data += 'Title: {}\n'.format(self.job.title)
 
@@ -82,19 +85,29 @@ class job_emailer(object):
 
     def gather_recipient_emails(self):
         """Gathers the recipients' emails into a comma delimited string."""
-
+        '''
         self.recipient_emails = []
 
         for recipient in self.recipients: 
             
             self.recipient_emails.append(recipient.email)
+        '''
+        self.recipient_emails = ''
+
+        for recipient in self.recipients: 
+            
+            self.recipient_emails += recipient.email + ','
+
+        self.recipient_emails = self.recipient_emails[:-1]
 
     def craft_message(self):
         """Crafts a locally-sourced, artisinal email message."""
 
         self.msg = MIMEText(self.msg_data,self.text_subtype)
 
-        self.msg['Subject'] = 'New Job Posted: {}'.format(self.job.title)
+        if self.is_new: self.msg['Subject'] = 'New Job Posted: {}'.format(self.job.title)
+
+        else: self.msg['Subject'] = 'Job Closed: {}'.format(self.job.title)
 
         self.msg['From'] = self.email
 
@@ -108,13 +121,7 @@ class job_emailer(object):
 
         try:
 
-            smtpObj = smtplib.SMTP(self.smtp, self.port)
-
-            smtpObj.ehlo()
-
-            smtpObj.starttls()
-
-            smtpObj.ehlo()
+            smtpObj = smtplib.SMTP_SSL(self.smtp, self.port)
 
             smtpObj.login(user=self.email,password=self.password)
 

@@ -5,7 +5,7 @@
 #   EMAIL
 #   PASSWORD
 
-SMTP=smtp.gmail.com
-PORT=587
-EMAIL=HCCT.Jobs@gmail.com
-PASSWORD=passwd
+SMTP=test.server.net
+PORT=1234
+EMAIL=email@test.net
+PASSWORD=password

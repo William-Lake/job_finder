@@ -12,8 +12,6 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
 
 ### Modules used
 
-**All of the following modules are native to Python 2.7+**
-
 - [sqlite3](https://docs.python.org/2/library/sqlite3.html)
 - [requests](http://docs.python-requests.org/en/master/)
 - [lxml](http://lxml.de/), specifically [html](http://lxml.de/lxmlhtml.html)
@@ -22,34 +20,60 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
 
 ## Getting started
 
-1. Clone/Download this repository.
-2. Navigate to the downloaded directory for this repo, unzip if necessary, and enter it.
-3. If you haven't already, open the directory in a command line/terminal session. 
-4. Execute `python job_finder.py`.
+1. Open a Command Line/Terminal Session
+2. Ensure you have python 2.7 installed before continuing. If not get it installed.
 
-## Behind the scenes
+```bash
+python --version
+```
 
-When executing `job_finder`:
+2. Clone this repository
 
-1. A connection to the sqlite database is created.
-2. All recipients are loaded from the database.
-3. All currently saved jobs are loaded from the database.
-4. All currently posted 'IT' jobs in Helena MT are gathered from the State's job site.
-5. Any jobs **found** on the jobs site that **haven't** been saved to the database are saved, and all the current recipients are notified of the new job.
-    - **NOTE:***The notification process is not yet complete.*
-6. Any jobs **not found** on the jobs site that **have** been saved are deleted from the database.
-7. The database connection is closed, committing the changes if directed.
+```bash
+git clone https://www.github.com/William-Lake/job_finder.git
+```
 
-**job_finder also provides the following methods:**
+3. Enter the repo's directory
 
-- add_recipient: Adds a given email to the database.
-- remove_recipient: Removes a given email from the database.
+```bash
+cd job_finder
+```
+
+3. Create a local copy of the database
+
+```bash
+sqlite3 Helena_Jobs.db < Create_DB.sql
+```
+
+4. Create a python script that imports job_finder
+
+```python
+from job_finder import job_finder
+```
+
+5. Create a job_finder object
+
+```python
+jf = job_finder()
+```
+
+6. Add/Remove recipient emails from the database
+
+```python
+jf.add_recipient('Test.Person@email.net')
+
+jf.remove_recipient('Sad.Sack@email.net')
+```
+
+7. Gather/Review current jobs and notify recipients
+
+```python
+jf.gather_and_review_jobs()
+```
 
 ## Database
 
 The database used for this project is sqlite. The included Create_DB.sql script shows the current database structure.
-
-Instead of an auto-generated id for jobs in the job table, I instead opted to generate a hashcode using all the job data. I'm certain this isnt' the best way, but it's what I went with at the time.
 
 ## TODO
 
@@ -57,13 +81,14 @@ Instead of an auto-generated id for jobs in the job table, I instead opted to ge
     - This works fine.
 - ~~At the moment there isn't any process for notifying recipients. A method exists in recipient.py, but it doesn't do anything. The original idea was to send an email. I currently have a [gist saved](https://gist.github.com/William-Lake/6eb8d8f5b08e0251b5df3589ead788a4) re: how to complete this but I'm uncertain if it's the best way. *This needs to be resolved.*~~
     - See job_emailer.py
-    - **Currently undergoing testing, not working at the moment.**
+    - ~~**Currently undergoing testing, not working at the moment.**~~
+    - **UPDATE: 03/02/2018** Resolved
 - Once the email notification issue has been resolved, the idea is to drop everything onto a web server and set up a cronjob to execute the job_finder script nightly.
     - [Potentially useful gist](https://gist.github.com/William-Lake/f50758f07a28f097fda78172379ecb63)
 - When this all gets set up on a web server, will need a web service/input page to handle gathering the user's email and adding it to the database- *after verifying they are allowed to do so.*
     - Best way to verify?
 - Instead of deleting jobs from the database, they should be saved in a 'job_history' table with a 'date_opened' and 'date_closed' field.
-- Add a method to notify users when a job *closes*.
+- ~~Add a method to notify users when a job *closes*.~~
 
 ## Moving Forward
 
