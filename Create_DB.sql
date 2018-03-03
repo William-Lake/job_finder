@@ -12,5 +12,7 @@ CREATE TABLE job
     contest_num INTEGER,
     title TEXT,
     dept TEXT,
-    site_url TEXT
+    site_url TEXT,
+    date_opened INTEGER,
+    date_closed INTEGER
 );

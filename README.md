@@ -21,7 +21,7 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
 ## Getting started
 
 1. Open a Command Line/Terminal Session
-2. Ensure you have python 2.7 installed before continuing. If not get it installed.
+2. Ensure you have python 2.7 installed before continuing. If not [get it installed](https://wiki.python.org/moin/BeginnersGuide/Download).
 
 ```bash
 python --version
@@ -39,25 +39,65 @@ git clone https://www.github.com/William-Lake/job_finder.git
 cd job_finder
 ```
 
-3. Create a local copy of the database
+3. Create a local copy of the database, if necessary.
 
 ```bash
 sqlite3 Helena_Jobs.db < Create_DB.sql
 ```
 
-4. Create a python script that imports job_finder
+## Usage
+
+Job Finder has an included `Driver` script whose intent is to manage interaction with the `job_finder` module. You can either make use of the Driver script, or you can use `job_finder` directly.
+
+### Using the Driver script
+
+Just like `job_finder`, the `Driver` script provies three main functions:
+
+- Add a recipient
+- Remove a recipient
+- Gather jobs/Review jobs/Notify recipients
+
+#### Add a recipient
+
+To add a new recipient you would execute the `Driver` script, passing in the `ADD` keyword followed by the recipient's email address, like so:
+
+```bash
+python Driver.py ADD test@email.com
+```
+
+#### Remove a recipient
+
+To remove a recipient you would execute the `Driver` script, passing in the `REMOVE` keyword followed by the recipient's email address, like so:
+
+```bash
+python Driver.py REMOVE test@email.com
+```
+
+#### Gather jobs/Review jobs/Notify recipients
+
+To perform the default `job_finder` fuctions, you would execute the `Driver` script with no arguments:
+
+```bash
+python Driver.py
+```
+
+### Using job_finder directly
+
+`job_finder` can be used directly as a class object. To do so:
+
+1. Create a python script that imports `job_finder`
 
 ```python
 from job_finder import job_finder
 ```
 
-5. Create a job_finder object
+2. Create a `job_finder` object
 
 ```python
 jf = job_finder()
 ```
 
-6. Add/Remove recipient emails from the database
+3. Add/Remove recipient emails from the database as desired
 
 ```python
 jf.add_recipient('Test.Person@email.net')
@@ -65,11 +105,26 @@ jf.add_recipient('Test.Person@email.net')
 jf.remove_recipient('Sad.Sack@email.net')
 ```
 
-7. Gather/Review current jobs and notify recipients
+4. Gather/Review current jobs and notify recipients
 
 ```python
 jf.gather_and_review_jobs()
 ```
+
+## Notifying recipients
+
+`job_finder` uses `job_emailer` to notify recipients of jobs that have either closed or opened recently.
+
+In order to do so, `job_emailer` needs a useable email address and password, as well as smtp and port info. All of this info needs to be stored in [Access_Data.txt](Access_Data.txt) in a key=value format, like so:
+
+```
+SMTP=test.server.net
+PORT=1234
+EMAIL=email@test.net
+PASSWORD=password
+```
+
+**NOTE:** `job_emailer` has only been tested with one email and may not work.
 
 ## Database
 
@@ -77,18 +132,11 @@ The database used for this project is sqlite. The included Create_DB.sql script 
 
 ## TODO
 
-- ~~Review current job id hashcode method, consider changing it.~~
-    - This works fine.
-- ~~At the moment there isn't any process for notifying recipients. A method exists in recipient.py, but it doesn't do anything. The original idea was to send an email. I currently have a [gist saved](https://gist.github.com/William-Lake/6eb8d8f5b08e0251b5df3589ead788a4) re: how to complete this but I'm uncertain if it's the best way. *This needs to be resolved.*~~
-    - See job_emailer.py
-    - ~~**Currently undergoing testing, not working at the moment.**~~
-    - **UPDATE: 03/02/2018** Resolved
-- Once the email notification issue has been resolved, the idea is to drop everything onto a web server and set up a cronjob to execute the job_finder script nightly.
+- Test `job_emailer` with other email accounts.
+- Once the email notification issue has been resolved, the idea is to drop everything onto a web server and set up a cronjob to execute the `job_finder` script nightly.
     - [Potentially useful gist](https://gist.github.com/William-Lake/f50758f07a28f097fda78172379ecb63)
 - When this all gets set up on a web server, will need a web service/input page to handle gathering the user's email and adding it to the database- *after verifying they are allowed to do so.*
-    - Best way to verify?
-- Instead of deleting jobs from the database, they should be saved in a 'job_history' table with a 'date_opened' and 'date_closed' field.
-- ~~Add a method to notify users when a job *closes*.~~
+    - Best way to verify incoming emails?
 
 ## Moving Forward
 

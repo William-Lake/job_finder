@@ -27,9 +27,7 @@ class db_connection(object):
             params {list} -- The parameters to use when executing the SQL statement. (default: {None})
         """
 
-        if params == None: self.conn.execute(statement)
-        
-        else: self.conn.execute(statement,params)
+        self.execute_statement(statement,params)
 
     def execute_select(self,statement,params=None):
         """Executes a SELECT statement on the database, returning the results.
@@ -50,6 +48,18 @@ class db_connection(object):
 
         return results
 
+    def execute_update(self,statement,params=None):
+        """Executes an UPDATE statement on the database.
+        
+        Arguments:
+            statement {str} -- The SQL statement to execute.
+        
+        Keyword Arguments:
+            params {list} -- The parameters to use when executing the SQL statement. (default: {None})
+        """
+
+        self.execute_statement(statement,params)
+
     def execute_delete(self,statement,params=None):
         """Executes a DELETE statement on the database.
         
@@ -58,6 +68,18 @@ class db_connection(object):
         
         Keyword Arguments:
             params {list} -- The parameters to use when executing the SQL statement. (default: {None})
+        """
+
+        self.execute_statement(statement,params)
+
+    def execute_statement(self,statement,params=None):
+        """Executes the given statement on the database.
+        
+        Arguments:
+            statement {str} -- The SQL statement to execute.
+        
+        Keyword Arguments:
+            params {list} -- The parameters to use when executing the SQL statement.. (default: {None})
         """
 
         if params == None: self.conn.execute(statement)

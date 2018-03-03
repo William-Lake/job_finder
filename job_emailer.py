@@ -55,6 +55,7 @@ class job_emailer(object):
         Arguments:
             recipients {list} -- The list of recipients to notify.
             job {job} -- The job to notify the recipients of.
+            is_new {boolean} -- True if this is a new job, False if it's a job being closed.
         """
         self.is_new = is_new
 
@@ -75,7 +76,7 @@ class job_emailer(object):
 
         if self.is_new: self.msg_data = 'NEW JOB\n'
 
-        else self.msg_data = 'JOB CLOSED\n'
+        else: self.msg_data = 'JOB CLOSED\n'
 
         self.msg_data += 'Title: {}\n'.format(self.job.title)
 
@@ -114,10 +115,7 @@ class job_emailer(object):
         self.msg['To'] = self.recipient_emails
 
     def send_email(self):
-        """Sends the created email.
-        
-            NOTE: Currently Untested.
-        """
+        """Sends the created email."""
 
         try:
 

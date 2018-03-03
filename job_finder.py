@@ -8,6 +8,7 @@ and notifies a group of users about it.
 Built for the IT students of UM Helena.
 """
 
+import sys
 import requests
 from lxml import html
 import time
@@ -26,6 +27,10 @@ class job_finder(object):
 		self.dbu = db_util()
 
 	def gather_and_review_jobs(self):
+		"""Gathers the jobs from the web, 
+		compares them to those in the database,
+		and notifies the recipients if necessary.
+		"""
 
 		self.mailer = job_emailer()
 
@@ -42,17 +47,27 @@ class job_finder(object):
 		self.conn_closed = True
 
 	def add_recipient(self,email):
+		"""Adds the given recipient to the database.
 		
+		Arguments:
+			email {str} -- The recipient's email to add to the database.
+		"""
+
 		self.dbu.add_recipient(email)
 
 	def remove_recipient(self,email):
+		"""Removes the given recipient from the database.
+		
+		Arguments:
+			email {str} -- The recipient's email to remove from the database.
+		"""
 
 		self.dbu.remove_recipient(email)
 
 	def review_jobs(self):
 		"""Gathers all the jobs from the State of MT jobs site,
 		saving those that are new,
-		and deleting those that have expired.
+		and deleting those that have closed.
 		"""
 
 		jobs_on_site = self.gather_jobs_on_site()
@@ -128,6 +143,15 @@ class job_finder(object):
 		return jobs_on_site
 
 	def find_jobs_to_save(self,jobs_on_site):
+		"""From the list of jobs that have been pulled from the web,
+		finds those that need to be saved.
+		
+		Arguments:
+			jobs_on_site {list} -- The jobs that have been pulled from the web.
+		
+		Returns:
+			list -- The jobs that should be saved.
+		"""
 
 		jobs_to_save = []
 
@@ -142,6 +166,15 @@ class job_finder(object):
 		return jobs_to_save
 
 	def find_jobs_to_delete(self,jobs_on_site):
+		"""From the list of jobs that have been pulled from the web,
+		finds those that need to be deleted.
+		
+		Arguments:
+			jobs_on_site {list} -- The jobs that have been pulled from the web.
+		
+		Returns:
+			list -- The jobs that should be saved.
+		"""
 
 		jobs_to_delete = []
 
@@ -154,6 +187,14 @@ class job_finder(object):
 		return jobs_to_delete
 
 	def gather_job_ids(self,jobs):
+		"""Creates a list of job ids from a given list of jobs.
+		
+		Arguments:
+			jobs {list} -- The jobs to gather the ids from.
+		
+		Returns:
+			list -- The job ids pulled from the provided jobs.
+		"""
 
 		job_ids = []
 
@@ -164,28 +205,7 @@ class job_finder(object):
 		return job_ids
 
 	def notify_recipients(self):
-		"""Notifies all recipients in the database about a new job.
-		
-		Arguments:
-			new_job {job} -- The job to notify recipeints of.
-		"""
-		for job in self.dbu.saved_jobs: self.mailer.notify_recipients_of_job(self.recipients,job)
+		"""Notifies all recipients in the database about a job closing or opening."""
+		for job in self.dbu.saved_jobs: self.mailer.notify_recipients_of_job(self.current_recipients,job)
 
-		for job in self.dbu.deleted_jobs: self.mailer.notify_recipients_of_job(self.recipients,job,False)
-
-def main():
-	"""Main method"""
-
-	try: 
-		
-		jf = job_finder()
-
-		jf.gather_and_review_jobs()
-
-	except:
-
-		print('There was an error during job_finder execution.')
-
-		if jf.conn_closed == False: jf.dbu.close_connection()
-
-if __name__ == '__main__': main()
+		for job in self.dbu.deleted_jobs: self.mailer.notify_recipients_of_job(self.current_recipients,job,False)
