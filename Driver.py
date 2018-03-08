@@ -7,6 +7,8 @@ from job_finder import job_finder
 def gather_arguments():
     """Gathers the command line arguments if they exist."""
 
+    print('Gathering Command Line Arguments')
+
     arguments = []
 
     try:
@@ -30,8 +32,8 @@ def execute_job_finder(jf,arguments=None):
     Keyword Arguments:
         arguments {list} -- The list of command line arguments provided. (default: {None})
     """
+    print('Starting Job Finder')
 
-    # Attempt to execute job finder...
     try:
 
         if arguments != None:
@@ -42,13 +44,13 @@ def execute_job_finder(jf,arguments=None):
         
             jf.gather_and_review_jobs()
 
-    except: # ...but if there were issues, make sure the db connection is closed.
+    except Exception as err: 
 
-        print('There was an error during job_finder execution.')
+        print('There was an error during job_finder execution: ')
 
-        if jf.conn_closed == False: 
-            
-            jf.dbu.close_connection()
+        print(err)
+
+    if jf.conn_closed == False: jf.dbu.close_connection()
 
 def parse_arguments(jf,arguments):
     """Parses the provided command line arguments.
@@ -57,16 +59,21 @@ def parse_arguments(jf,arguments):
         jf {job_finder} -- The Job Finder object.
         arguments {list} -- The command line arguments to parse.
     """
+    print('Parsing Command Line Arguments')
 
-    email = arguments[1]
+    target = arguments[1].strip()
 
     if arguments[0].upper() == 'ADD':
 
-        jf.add_recipient(email)
+        if target.endswith('.txt'): jf.add_recipients(target)
+
+        else: jf.add_recipient(target)
 
     elif arguments[0].upper() == 'REMOVE':
 
-        jf.remove_recipient(email)
+        if target.endswith('.txt'): jf.remove_recipients(target)
+        
+        else: jf.remove_recipient(target)
 
 jf = job_finder()
 

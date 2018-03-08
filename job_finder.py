@@ -26,11 +26,14 @@ class job_finder(object):
 
 		self.dbu = db_util()
 
+		self.conn_closed = False
+
 	def gather_and_review_jobs(self):
 		"""Gathers the jobs from the web, 
 		compares them to those in the database,
 		and notifies the recipients if necessary.
 		"""
+		print('Gathering and Reviewing Jobs')
 
 		self.mailer = job_emailer()
 
@@ -55,6 +58,14 @@ class job_finder(object):
 
 		self.dbu.add_recipient(email)
 
+	def add_recipients(self,file_name):
+
+		print('Saving Recipients in ' + file_name)
+
+		emails = open(file_name).readlines()
+
+		for email in emails: self.add_recipient(email.strip())
+
 	def remove_recipient(self,email):
 		"""Removes the given recipient from the database.
 		
@@ -64,11 +75,20 @@ class job_finder(object):
 
 		self.dbu.remove_recipient(email)
 
+	def remove_recipients(self,file_name):
+
+		print('Removing Recipients in ' + file_name)
+
+		emails = open(file_name).readlines()
+
+		for email in emails: self.remove_recipient(email.strip())
+
 	def review_jobs(self):
 		"""Gathers all the jobs from the State of MT jobs site,
 		saving those that are new,
 		and deleting those that have closed.
 		"""
+		print('Reviewing Jobs')
 
 		jobs_on_site = self.gather_jobs_on_site()
 
@@ -90,6 +110,8 @@ class job_finder(object):
 		Returns:
 			list -- The of jobs to delete.
 		"""
+
+		print('Gathering Jobs From Site')
 
 		jobs_on_site = []
 
@@ -152,6 +174,7 @@ class job_finder(object):
 		Returns:
 			list -- The jobs that should be saved.
 		"""
+		print('Finding jobs to save')
 
 		jobs_to_save = []
 
@@ -162,6 +185,8 @@ class job_finder(object):
 			job_id = job.job_id
 
 			if job_id not in current_job_ids: jobs_to_save.append(job)
+
+		print('Found {} Jobs To Save'.format(len(jobs_to_save)))
 
 		return jobs_to_save
 
@@ -175,6 +200,7 @@ class job_finder(object):
 		Returns:
 			list -- The jobs that should be saved.
 		"""
+		print('Finding jobs to delete')
 
 		jobs_to_delete = []
 
@@ -183,6 +209,8 @@ class job_finder(object):
 		for job in self.current_jobs:
 
 			if job.job_id not in site_job_ids: jobs_to_delete.append(job)
+
+		print('Found {} Jobs to Delete'.format(len(jobs_to_delete)))
 
 		return jobs_to_delete
 
@@ -206,6 +234,9 @@ class job_finder(object):
 
 	def notify_recipients(self):
 		"""Notifies all recipients in the database about a job closing or opening."""
+		
+		print('Notifying Recipients')
+
 		for job in self.dbu.saved_jobs: self.mailer.notify_recipients_of_job(self.current_recipients,job)
 
 		for job in self.dbu.deleted_jobs: self.mailer.notify_recipients_of_job(self.current_recipients,job,False)

@@ -12,6 +12,7 @@ class db_connection(object):
 
     def __init__(self):
         """Constructor"""
+        print('Connecting To DB')
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -92,6 +93,7 @@ class db_connection(object):
         Keyword Arguments:
             do_commit {boolean} -- True if the database changes should be committed. (default: {False})
         """
+        print('Closing DB Connection')
 
         if do_commit: self.conn.commit()
 

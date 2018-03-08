@@ -5,7 +5,7 @@
 #   EMAIL
 #   PASSWORD
 
-SMTP=test.server.net
-PORT=1234
-EMAIL=email@test.net
-PASSWORD=password
+SMTP=xx
+PORT=xx
+EMAIL=xx
+PASSWORD=xx

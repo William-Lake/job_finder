@@ -19,6 +19,8 @@ class db_util(object):
     def gather_current_recipients(self):
         """Gathers all the currently saved recipients in the database."""
         
+        print('Gathering Recipients')
+
         recipients = []
 
         recipients_data = self.db_conn.execute_select('SELECT * FROM recipient')
@@ -27,10 +29,14 @@ class db_util(object):
 
             recipients.append(recipient(recipient_data))
 
+        print('{} Recipients Gathered'.format(len(recipients)))
+
         return recipients
 
     def gather_current_jobs(self):
         """Gathers all the currently saved jobs in the database."""
+
+        print('Gathering Current Jobs')
 
         current_jobs = []
 
@@ -38,9 +44,13 @@ class db_util(object):
 
         jobs_data = self.db_conn.execute_select(statement)
 
-        for job_data in jobs_data:
+        if jobs_data is not None:
 
-            current_jobs.append(job(job_data))
+            for job_data in jobs_data:
+
+                current_jobs.append(job(job_data))
+
+        print('{} Jobs Gathered'.format(len(current_jobs)))
 
         return current_jobs
 
@@ -51,11 +61,13 @@ class db_util(object):
             jobs_to_save {list} -- The jobs to save in the database.
         """
 
+        print('Saving {} Jobs'.format(len(jobs_to_save)))
+
         self.saved_jobs = jobs_to_save
 
         for job in jobs_to_save:
 
-            statement = 'INSERT INTO job (id,site_id,contest_num,title,dept,site_url,date_opened) VALUES (?,?,?,?,?,?)'
+            statement = 'INSERT INTO job (id,site_id,contest_num,title,dept,site_url,date_opened) VALUES (?,?,?,?,?,?,?)'
 
             params = (job.job_id, job.site_id, job.contest_num, job.title, job.dept, job.site_url,time.time())
 
@@ -69,6 +81,8 @@ class db_util(object):
         Arguments:
             jobs_to_delete {list} -- The jobs to 'Delete' from the database.
         """
+
+        print('Deleting {} Jobs'.format(len(jobs_to_delete)))
 
         self.deleted_jobs = jobs_to_delete
 
@@ -86,6 +100,7 @@ class db_util(object):
         Arguments:
             email {str} -- The email to add to the database.
         """
+        print('Adding Recipient: ' + email)
 
         statement = 'INSERT INTO recipient (email,date_added) VALUES (?,?)'
 
@@ -99,6 +114,7 @@ class db_util(object):
         Arguments:
             email {str} -- The email to remove from the database.
         """
+        print('Removing Recipient: ' + email)
 
         statement = 'DELETE FROM recipient WHERE email = ?'
 
@@ -109,4 +125,4 @@ class db_util(object):
     def close_connection(self):
         """Closes the connection to the database."""
 
-        self.db_conn.close()
+        self.db_conn.close(True)

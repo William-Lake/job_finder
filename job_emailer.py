@@ -15,6 +15,8 @@ class job_emailer(object):
 
     def load_access_data(self):
         """Loads the data necessary to login to an email account so emails can be sent from it."""
+        
+        print('Loading Email Access Data')
 
         try: 
             # Read in the Access_Data.txt file to a list.
@@ -57,6 +59,7 @@ class job_emailer(object):
             job {job} -- The job to notify the recipients of.
             is_new {boolean} -- True if this is a new job, False if it's a job being closed.
         """
+        
         self.is_new = is_new
 
         self.job = job
@@ -117,16 +120,24 @@ class job_emailer(object):
     def send_email(self):
         """Sends the created email."""
 
-        try:
+        if self.recipient_emails == None or len(self.recipient_emails) == 0:
 
-            smtpObj = smtplib.SMTP_SSL(self.smtp, self.port)
+            print('No Recipient emails in DB.')
 
-            smtpObj.login(user=self.email,password=self.password)
+        else:
 
-            smtpObj.sendmail(self.email,self.recipient_emails, self.msg.as_string())
+            try:
 
-            smtpObj.quit()
+                smtpObj = smtplib.SMTP_SSL(self.smtp, self.port)
 
-        except smtplib.SMTPException as error:
+                smtpObj.login(user=self.email,password=self.password)
 
-            print('ERROR Unable to send email : {err}'.format(err=error))
+                print(self.recipient_emails)
+
+                smtpObj.sendmail(self.email,self.recipient_emails, self.msg.as_string())
+
+                smtpObj.quit()
+
+            except smtplib.SMTPException as error:
+
+                print('ERROR Unable to send email : {err}'.format(err=error))
