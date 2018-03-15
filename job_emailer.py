@@ -1,5 +1,6 @@
 """Emails recipients about new jobs."""
 
+import os
 import smtplib
 from email.mime.text import MIMEText
 import sys
@@ -18,10 +19,12 @@ class job_emailer(object):
         
         print('Loading Email Access Data')
 
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+
         try: 
             # Read in the Access_Data.txt file to a list.
             # One line in Access_Data.txt = One item in the list.
-            access_data = open('Access_Data.txt').readlines()
+            access_data = open(os.path.join(current_dir,'Access_Data.txt')).readlines()
 
         except:
 
