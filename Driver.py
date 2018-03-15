@@ -2,6 +2,8 @@
 
 
 import sys
+import os
+from datetime import datetime
 from job_finder import job_finder
 
 def gather_arguments():
@@ -22,6 +24,18 @@ def gather_arguments():
         arguments = None
 
     return arguments
+
+def print_banner():
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    banner = open(os.path.join(current_dir,'job_finder_banner.txt')).read()
+
+    current_date = datetime.now().strftime('%c')
+
+    print(banner)
+
+    print(current_date)
 
 def execute_job_finder(jf,arguments=None):
     """Executes the Job Finder module.
@@ -75,8 +89,12 @@ def parse_arguments(jf,arguments):
         
         else: jf.remove_recipient(target)
 
-jf = job_finder()
-
 arguments = gather_arguments()
 
+print_banner()
+
+jf = job_finder()
+
 execute_job_finder(jf,arguments)
+
+print('\n\n+----------------------------------------------------------------+\n\n')
