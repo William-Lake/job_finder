@@ -94,20 +94,12 @@ class job_emailer(object):
 
     def gather_recipient_emails(self):
         """Gathers the recipients' emails into a comma delimited string."""
-        '''
+        
         self.recipient_emails = []
 
         for recipient in self.recipients: 
             
             self.recipient_emails.append(recipient.email)
-        '''
-        self.recipient_emails = ''
-
-        for recipient in self.recipients: 
-            
-            self.recipient_emails += recipient.email + ','
-
-        self.recipient_emails = self.recipient_emails[:-1]
 
     def craft_message(self,email):
         """Crafts a locally-sourced, artisinal email message."""
