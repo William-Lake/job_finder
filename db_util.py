@@ -125,4 +125,4 @@ class db_util(object):
     def close_connection(self):
         """Closes the connection to the database."""
 
-        self.db_conn.close(True)
+        self.db_conn.close()

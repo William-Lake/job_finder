@@ -87,7 +87,7 @@ class db_connection(object):
 
         else: self.conn.execute(statement,params)
 
-    def close(self,do_commit=False):
+    def close(self):
         """Closes the database connection, commiting the changes if necessary.
         
         Keyword Arguments:
@@ -95,6 +95,6 @@ class db_connection(object):
         """
         print('Closing DB Connection')
 
-        if do_commit: self.conn.commit()
+        self.conn.commit()
 
         self.conn.close()
