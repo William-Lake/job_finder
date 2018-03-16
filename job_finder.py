@@ -45,10 +45,6 @@ class job_finder(object):
 
 		if changes_made: self.notify_recipients()
 
-		self.dbu.close_connection()
-
-		self.conn_closed = True
-
 	def add_recipient(self,email):
 		"""Adds the given recipient to the database.
 		

@@ -64,8 +64,6 @@ def execute_job_finder(jf,arguments=None):
 
         print(err)
 
-    if jf.conn_closed == False: jf.dbu.close_connection()
-
 def parse_arguments(jf,arguments):
     """Parses the provided command line arguments.
     
@@ -96,5 +94,7 @@ print_banner()
 jf = job_finder()
 
 execute_job_finder(jf,arguments)
+
+if jf.conn_closed == False: jf.dbu.close_connection()
 
 print('\n\n+----------------------------------------------------------------+\n\n')
