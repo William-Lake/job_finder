@@ -84,13 +84,11 @@ class db_util(object):
 
         print('Deleting {} Jobs'.format(len(jobs_to_delete)))
 
-        self.deleted_jobs = jobs_to_delete
-
         for job in jobs_to_delete:
 
             statement = 'UPDATE job SET date_closed = ? WHERE id = ?'
 
-            params = (job.job_id,time.time())
+            params = (time.time(),job.job_id)
 
             self.db_conn.execute_update(statement,params)
 

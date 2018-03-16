@@ -170,7 +170,7 @@ class job_finder(object):
 		Returns:
 			list -- The jobs that should be saved.
 		"""
-		print('Finding jobs to save')
+		print('Finding Jobs to save')
 
 		jobs_to_save = []
 
@@ -196,7 +196,7 @@ class job_finder(object):
 		Returns:
 			list -- The jobs that should be saved.
 		"""
-		print('Finding jobs to delete')
+		print('Finding Jobs to delete')
 
 		jobs_to_delete = []
 
