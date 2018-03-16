@@ -87,6 +87,8 @@ class db_connection(object):
 
         else: self.conn.execute(statement,params)
 
+        self.conn.commit()
+
     def close(self):
         """Closes the database connection, commiting the changes if necessary.
         
