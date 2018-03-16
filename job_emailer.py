@@ -73,9 +73,11 @@ class job_emailer(object):
 
         self.gather_recipient_emails()
 
-        self.craft_message()
+        for email in self.recipient_emails:
 
-        self.send_email()
+            self.craft_message(email)
+
+            self.send_email(email)
 
     def create_email_body(self):
         """Creates the email body using the data from the job object."""
@@ -107,7 +109,7 @@ class job_emailer(object):
 
         self.recipient_emails = self.recipient_emails[:-1]
 
-    def craft_message(self):
+    def craft_message(self,email):
         """Crafts a locally-sourced, artisinal email message."""
 
         self.msg = MIMEText(self.msg_data,self.text_subtype)
@@ -118,29 +120,24 @@ class job_emailer(object):
 
         self.msg['From'] = self.email
 
-        self.msg['To'] = self.recipient_emails
+        self.msg['To'] = email
 
-    def send_email(self):
+    def send_email(self,email):
         """Sends the created email."""
 
-        if self.recipient_emails == None or len(self.recipient_emails) == 0:
+        try:
 
-            print('No Recipient emails in DB.')
+            smtpObj = smtplib.SMTP_SSL(self.smtp, self.port)
 
-        else:
+            smtpObj.login(user=self.email,password=self.password)
 
-            try:
+            print('Sending to ' + email)
 
-                smtpObj = smtplib.SMTP_SSL(self.smtp, self.port)
+            smtpObj.sendmail(self.email,email, self.msg.as_string())
 
-                smtpObj.login(user=self.email,password=self.password)
+            smtpObj.quit()
 
-                print(self.recipient_emails)
+        except smtplib.SMTPException as error:
 
-                smtpObj.sendmail(self.email,self.recipient_emails, self.msg.as_string())
+            print('ERROR Unable to send email : {err}'.format(err=error))
 
-                smtpObj.quit()
-
-            except smtplib.SMTPException as error:
-
-                print('ERROR Unable to send email : {err}'.format(err=error))
