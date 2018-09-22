@@ -5,25 +5,23 @@ Represents an IT Job found in Helena, MT.
 
 """
 
-from db_connection import db_connection
+class Job(object):
 
-class job(object):
-
-    def __init__(self,job_data):
+    def __init__(self,job_id,site_id,contest_num,title,dept,site_url):
         """Constructor
         
         Arguments:
             job_data {list} -- The list of job data to use when building this job object.
         """
 
-        self.job_id = job_data[0]
+        self.job_id = job_id
 
-        self.site_id = job_data[1]
+        self.site_id = site_id
 
-        self.contest_num = job_data[2]
+        self.contest_num = contest_num
 
-        self.title = job_data[3]
+        self.title = title
 
-        self.dept = job_data[4]
+        self.dept = dept
 
-        self.site_url = job_data[5]
+        self.site_url = site_url

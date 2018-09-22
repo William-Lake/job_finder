@@ -4,19 +4,17 @@ Recipient
 Represents a recipient of new job notifications.
 """
 
-from db_connection import db_connection
+class Recipient(object):
 
-class recipient(object):
-
-    def __init__(self,recipient_data):
+    def __init__(self,recipient_id,email,date_added):
         """Constructor
         
         Arguments:
             recipient_data {list} -- The data to use when building this recipient object.
         """
 
-        self.recipient_id = recipient_data[0]
+        self.recipient_id = recipient_id
 
-        self.email = recipient_data[1]
+        self.email = email
 
-        self.date_added = recipient_data[2]
+        self.date_added = date_added

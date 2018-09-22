@@ -4,19 +4,22 @@ DB Connection
 Represents the connection to the database, 
 centralizing transactions and management.
 """
-
+import logging
 import sqlite3
 import os
+import job_finder_props
 
-class db_connection(object):
+class Db_Connection(object):
 
     def __init__(self):
         """Constructor"""
-        print('Connecting To DB')
+        self.logger = logging.getLogger()
+
+        self.logger.info('Connecting To DB')
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
-        self.conn = sqlite3.connect(os.path.join(current_dir,'Helena_Jobs.db'))
+        self.conn = sqlite3.connect(os.path.join(current_dir,job_finder_props.DB_NAME))
 
     def execute_insert(self,statement,params=None):
         """Executes an INSERT on the database.
@@ -95,7 +98,7 @@ class db_connection(object):
         Keyword Arguments:
             do_commit {boolean} -- True if the database changes should be committed. (default: {False})
         """
-        print('Closing DB Connection')
+        self.logger.info('Closing DB Connection')
 
         self.conn.commit()
 

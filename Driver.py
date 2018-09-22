@@ -4,97 +4,90 @@
 import sys
 import os
 from datetime import datetime
-from job_finder import job_finder
+import logging
+from logging.config import fileConfig
+from job_finder import Job_Finder
 
-def gather_arguments():
-    """Gathers the command line arguments if they exist."""
+class Driver(object):
 
-    print('Gathering Command Line Arguments')
+    DEFAULT_CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logging.conf')
 
-    arguments = []
+    def __init__(self):
 
-    try:
+        self.load_configuration()
 
-        arguments.append(sys.argv[1])
+        self.logger = logging.getLogger()
 
-        arguments.append(sys.argv[2])
+        self.job_finder = Job_Finder(self.gather_arguments())
 
-    except:
+        try:
 
-        arguments = None
+            self.job_finder.start()
 
-    return arguments
+        except Exception as err: 
 
-def print_banner():
+            self.logger.exception('There was an error during job_finder execution: %r' % err)
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+        if self.job_finder.conn_closed == False: self.job_finder.db_util.close_connection()
 
-    banner = open(os.path.join(current_dir,'job_finder_banner.txt')).read()
+    def load_configuration(self,config_file=DEFAULT_CONFIG_FILE):
+        """
+        Loads logging configuration from the given configuration file.
 
-    current_date = datetime.now().strftime('%c')
+        Code from: https://github.com/storj/storj-python-sdk/blob/master/tests/log_config.py
 
-    print(banner)
+        Code found via: https://www.programcreek.com/python/example/105587/logging.config.fileConfig
 
-    print(current_date)
+        :param config_file:
+            the configuration file (default=/etc/package/logging.conf)
+        :type config_file: str
+        """
+        if not os.path.exists(config_file) or not os.path.isfile(config_file):
 
-def execute_job_finder(jf,arguments=None):
-    """Executes the Job Finder module.
-    
-    Arguments:
-        jf {job_finder} -- The Job Finder object.
-    
-    Keyword Arguments:
-        arguments {list} -- The list of command line arguments provided. (default: {None})
-    """
-    print('Starting Job Finder')
+            msg = '%s configuration file does not exist!', config_file
 
-    try:
+            logging.getLogger().error(msg)
 
-        if arguments != None:
+            raise ValueError(msg)
 
-            parse_arguments(jf,arguments)
+        try:
+            fileConfig(config_file, disable_existing_loggers=False)
 
-        else:
-        
-            jf.gather_and_review_jobs()
+            logging.getLogger().info('%s configuration file was loaded.', config_file)
 
-    except Exception as err: 
+        except Exception as e:
 
-        print('There was an error during job_finder execution: ')
+            logging.getLogger().error('Failed to load configuration from %s!', config_file)
 
-        print(err)
+            logging.getLogger().debug(str(e), exc_info=True)
 
-def parse_arguments(jf,arguments):
-    """Parses the provided command line arguments.
-    
-    Arguments:
-        jf {job_finder} -- The Job Finder object.
-        arguments {list} -- The command line arguments to parse.
-    """
-    print('Parsing Command Line Arguments')
+            raise e
 
-    target = arguments[1].strip()
+    def gather_arguments(self):
+        """Gathers the command line arguments if they exist."""
 
-    if arguments[0].upper() == 'ADD':
+        self.logger.info('Gathering Command Line Arguments')
 
-        if target.endswith('.txt'): jf.add_recipients(target)
+        args = []
 
-        else: jf.add_recipient(target)
+        try:
 
-    elif arguments[0].upper() == 'REMOVE':
+            args.append(sys.argv[1])
 
-        if target.endswith('.txt'): jf.remove_recipients(target)
-        
-        else: jf.remove_recipient(target)
+            args.append(sys.argv[2])
 
-arguments = gather_arguments()
+            self.logger.debug('Arg 1: {}'.format(args[0]))
 
-print_banner()
+            self.logger.debug('Arg 2: {}'.format(args[1]))
 
-jf = job_finder()
+        except:
 
-execute_job_finder(jf,arguments)
+            args = None
 
-if jf.conn_closed == False: jf.dbu.close_connection()
+            self.logger.debug('Less than 2 arguments provided.')
 
-print('\n\n+----------------------------------------------------------------+\n\n')
+        return args
+
+if __name__ == '__main__': 
+
+    driver = Driver()

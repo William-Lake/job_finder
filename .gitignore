@@ -1,3 +1,6 @@
+job_finder_props.py
 .pyc
-Access_Data.txt
-Helena_Jobs.db
+.log
+.db
+.vscode/
+__pycache__/

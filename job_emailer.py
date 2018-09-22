@@ -1,55 +1,30 @@
 """Emails recipients about new jobs."""
 
 import os
+import job_finder_props
+import logging
 import smtplib
 from email.mime.text import MIMEText
 import sys
-from recipient import recipient
-from job import job
+from recipient import Recipient
+from job import Job
 
-class job_emailer(object):
+class Job_Emailer(object):
 
     def __init__(self):
         """Constructor"""
 
-        self.load_access_data()
+        self.logger = logging.getLogger()
 
-    def load_access_data(self):
-        """Loads the data necessary to login to an email account so emails can be sent from it."""
-        
-        print('Loading Email Access Data')
+        self.logger.info('Initializing Job Emailer')
 
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.email = job_finder_props.EMAIL
 
-        try: 
-            # Read in the Access_Data.txt file to a list.
-            # One line in Access_Data.txt = One item in the list.
-            access_data = open(os.path.join(current_dir,'Access_Data.txt')).readlines()
+        self.password = job_finder_props.PASSWORD
 
-        except:
+        self.smtp = job_finder_props.SMTP
 
-            print("This module requires a file called 'Access_Data.txt' in its directory which contains the username and password to a gmail account.")
-
-        # Iterate through the lines of data read in from Access_Data.txt, saving what's appropriate.
-        for line in access_data:
-
-            # Want to skip lines that are comments, blank, or don't contain the equals sign.
-            if line.startswith('#') or len(line.strip()) == 0 or '=' not in line: continue
-
-            # The format of each line with useful data is Key=Value
-            access_items = line.split('=')
-
-            data_type = access_items[0].strip().upper()
-
-            data = access_items[1].strip()
-
-            if data_type == 'EMAIL': self.email = data
-
-            elif data_type == 'PASSWORD': self.password = data
-
-            elif data_type == 'SMTP': self.smtp = data
-
-            elif data_type == 'PORT': self.port = data
+        self.port = job_finder_props.PORT
 
         # Assumed for now, no current plans to send emails with anything else.
         self.text_subtype = 'plain'
@@ -123,13 +98,12 @@ class job_emailer(object):
 
             smtpObj.login(user=self.email,password=self.password)
 
-            print('Sending to ' + email)
+            self.logger.debug('Sending to ' + email)
 
             smtpObj.sendmail(self.email,email, self.msg.as_string())
 
             smtpObj.quit()
 
-        except smtplib.SMTPException as error:
+        except smtplib.SMTPException as err:
 
-            print('ERROR Unable to send email : {err}'.format(err=error))
-
+            self.logger.exception('ERROR Unable to send email : %r' % err)

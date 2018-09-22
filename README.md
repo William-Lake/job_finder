@@ -6,22 +6,26 @@ Job data gathered from the State of Montana's [central job site](https://mtstate
 
 ## Requirements
 
-This project was built using Python 2.7, on Ubuntu 16.04. 
+This project was built using Python 3.6, on Ubuntu 18.04. 
 
 If you're on a Windows system, I recommend [this guide](https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation) to get your Python environment variables set up.
 
 ### Modules used
 
-- [sqlite3](https://docs.python.org/2/library/sqlite3.html)
+- [os](https://docs.python.org/3.6/library/os.html)
+- [sys](https://docs.python.org/3.6/library/sys.html)
+- [time](https://docs.python.org/3.6/library/time.html)
+- [logging](https://docs.python.org/3.6/howto/logging.html)
 - [requests](http://docs.python-requests.org/en/master/)
+- [urllib](https://docs.python.org/3.6/library/urllib.html)
+- [smtplib](https://docs.python.org/3.6/library/smtplib.html)
 - [lxml](http://lxml.de/), specifically [html](http://lxml.de/lxmlhtml.html)
-- [time](https://docs.python.org/2/library/time.html)
-- [urllib](https://docs.python.org/2/library/urllib.html)
+- [sqlite3](https://docs.python.org/3.6/library/sqlite3.html)
 
 ## Getting started
 
 1. Open a Command Line/Terminal Session
-2. Ensure you have python 2.7 installed before continuing. If not [get it installed](https://wiki.python.org/moin/BeginnersGuide/Download).
+2. Ensure you have python 3 installed before continuing. If not [get it installed](https://wiki.python.org/moin/BeginnersGuide/Download).
 
 ```bash
 python --version
@@ -47,11 +51,11 @@ sqlite3 Helena_Jobs.db < Create_DB.sql
 
 ## Usage
 
-Job Finder has an included `Driver` script whose intent is to manage interaction with the `job_finder` module. You can either make use of the Driver script, or you can use `job_finder` directly.
+Job Finder has an included `Driver` script whose intent is to manage interaction with the `job_finder` module.
 
 ### Using the Driver script
 
-Just like `job_finder`, the `Driver` script provies three main functions:
+The `Driver` script provies three main functions:
 
 - Add a recipient
 - Remove a recipient
@@ -65,6 +69,12 @@ To add a new recipient you would execute the `Driver` script, passing in the `AD
 python Driver.py ADD test@email.com
 ```
 
+You can also add a list of recipients, however **they need to be in a .txt file with one recipient per line.**
+
+```bash
+python Driver.py ADD recipients_to_add.txt
+```
+
 #### Remove a recipient
 
 To remove a recipient you would execute the `Driver` script, passing in the `REMOVE` keyword followed by the recipient's email address, like so:
@@ -73,49 +83,25 @@ To remove a recipient you would execute the `Driver` script, passing in the `REM
 python Driver.py REMOVE test@email.com
 ```
 
+You can also remove a list of recipients, however **they need to be in a .txt file with one recipient per line.**
+
+```bash
+python Driver.py ADD recipients_to_remove.txt
+```
+
 #### Gather jobs/Review jobs/Notify recipients
 
-To perform the default `job_finder` fuctions, you would execute the `Driver` script with no arguments:
+To perform the default `Job_Finder` fuctions, you would execute the `Driver` script with no arguments:
 
 ```bash
 python Driver.py
 ```
 
-### Using job_finder directly
-
-`job_finder` can be used directly as a class object. To do so:
-
-1. Create a python script that imports `job_finder`
-
-```python
-from job_finder import job_finder
-```
-
-2. Create a `job_finder` object
-
-```python
-jf = job_finder()
-```
-
-3. Add/Remove recipient emails from the database as desired
-
-```python
-jf.add_recipient('Test.Person@email.net')
-
-jf.remove_recipient('Sad.Sack@email.net')
-```
-
-4. Gather/Review current jobs and notify recipients
-
-```python
-jf.gather_and_review_jobs()
-```
-
 ## Notifying recipients
 
-`job_finder` uses `job_emailer` to notify recipients of jobs that have either closed or opened recently.
+`Job_Finder` uses `Job_Emailer` to notify recipients of jobs that have either closed or opened recently.
 
-In order to do so, `job_emailer` needs a useable email address and password, as well as smtp and port info. All of this info needs to be stored in [Access_Data.txt](Access_Data.txt) in a key=value format, like so:
+In order to do so, `Job_Emailer` needs a useable email address and password, as well as smtp and port info. All of this info needs to be stored in [job_finder_props.py](job_finder_props.py) setting the appropriate values for each variable, like so:
 
 ```
 SMTP=test.server.net
@@ -124,19 +110,11 @@ EMAIL=email@test.net
 PASSWORD=password
 ```
 
-**NOTE:** `job_emailer` has only been tested with one email and may not work.
+**NOTE** that your password will be in plain text. **This is not secure and will be addressed in future iterations.** Additionally, `Job_Emailer` has only been tested with one email and may not work with others.
 
 ## Database
 
 The database used for this project is sqlite. The included Create_DB.sql script shows the current database structure.
-
-## TODO
-
-- Test `job_emailer` with other email accounts.
-- Once the email notification issue has been resolved, the idea is to drop everything onto a web server and set up a cronjob to execute the `job_finder` script nightly.
-    - [Potentially useful gist](https://gist.github.com/William-Lake/f50758f07a28f097fda78172379ecb63)
-- When this all gets set up on a web server, will need a web service/input page to handle gathering the user's email and adding it to the database- *after verifying they are allowed to do so.*
-    - Best way to verify incoming emails?
 
 ## Moving Forward
 
