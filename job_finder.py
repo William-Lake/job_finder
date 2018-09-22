@@ -245,6 +245,6 @@ class Job_Finder(object):
 
 			self.logger.info('Notifying Recipients')
 
-			# for job in self.db_util.saved_jobs: self.job_emailer.notify_recipients_of_job(self.current_recipients,job)
+			for job in self.db_util.saved_jobs: self.job_emailer.notify_recipients_of_job(self.current_recipients,job)
 
-			# for job in self.db_util.deleted_jobs: self.job_emailer.notify_recipients_of_job(self.current_recipients,job,False)
+			for job in self.db_util.deleted_jobs: self.job_emailer.notify_recipients_of_job(self.current_recipients,job,False)
