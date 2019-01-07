@@ -15,35 +15,25 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 """Emails recipients about new jobs."""
 
-import os
-import jobfinder.job_finder_props
 import logging
 import smtplib
 from email.mime.text import MIMEText
-import sys
 
-# update for packaging, use . relative path identifiers
-from .recipient import Recipient
-from .job import Job
-
-import jobfinder.db_util
-
-import jobfinder.db_util
 from jobfinder.db_util import get_props
-
 
 class Job_Emailer(object):
 
     def __init__(self):
         """Constructor"""
 
-        self.data = get_props()
+        props = get_props()
+
         self.logger = logging.getLogger()
         self.logger.info('Initializing Job Emailer')
-        self.smtp = self.data[1]
-        self.port = self.data[2]
-        self.email = self.data[3]
-        self.password = self.data[4]
+        self.smtp = props[1]
+        self.port = props[2]
+        self.email = props[3]
+        self.password = props[4]
 
         # Assumed for now, no current plans to send emails with anything else.
         self.text_subtype = 'plain'
