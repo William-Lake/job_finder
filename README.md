@@ -6,7 +6,8 @@ Job data gathered from the State of Montana's [central job site](https://mtstate
 
 ## Requirements
 
-This project was built using Python 3.6, on Ubuntu 18.04. 
+This project was built using Python 3.6, on Ubuntu 18.04, and tested
+on Win-10 via [conda](https://conda.io/docs/) virtual environments.
 
 If you're on a Windows system, I recommend [this guide](https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation) to get your Python environment variables set up.
 
@@ -25,7 +26,7 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
 ## Getting started
 
 1. Open a Command Line/Terminal Session
-1. Ensure you have python 3 installed before continuing. If not 
+1. Ensure you have python 3 installed before continuing. If not
 1. [get it installed](https://wiki.python.org/moin/BeginnersGuide/Download).
 
     ```shell
@@ -38,7 +39,7 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
     git clone https://www.github.com/William-Lake/job_finder.git
     ```
 
-1. Enter the repository and install with `pip.
+1. Enter the repository and install with `pip`.
 
     ```shell
     # Dont forget the "." after -e
@@ -123,7 +124,7 @@ $HOME/.local/share/jobfinder/jobfinder.db
 
 The data required for the `props` table (SQLite | PostgreSQL) is as follows:
 
-```
+```shell
 SMTP=test.server.net
 PORT=1234
 EMAIL=email@test.net
@@ -138,7 +139,7 @@ The database used for this project (currently) is sqlite. The included `sqlite.s
 
 ## Moving Forward
 
-This repo currently only gathers State of Montana IT Jobs. It would be useful to combine this functionality with jobs gathered from the private and/or non-profit sector.
+This repository currently only gathers State of Montana IT Jobs. It would be useful to combine this functionality with jobs gathered from the private and/or non-profit sector.
 
 Additionally, it will likely be useful at some point to provide a web interface to display the currently gathered jobs.
 
