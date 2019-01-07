@@ -41,7 +41,8 @@ setuptools.setup(
     install_requires=[
         'requests',
         'lxml',
-        'psycopg2'
+        'psycopg2',
+        'sqlite3'
     ],
     package_data={
         'jobfinder': [
