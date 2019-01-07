@@ -66,20 +66,6 @@ def check_db():
     if os.path.isfile(get_db()):
         try:
             version_db()
-            with sqlite3.connect(get_db()) as conn:
-                cur = conn.cursor()
-                cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
-                for row in cur.fetchall():
-                    aut = row[0]
-                    cop = row[1]
-                    lic = row[2]
-                    ver = row[3]
-                    cnt = row[4]
-                    sta = row[5]
-                    print("Table appdata => {aut} {cop} {lic} {ver} "
-                          "{cnt} sta".format(aut=aut, cop=cop, lic=lic, ver=ver,
-                                             cnt=cnt, sta=sta))
-            conn.close()
             return "Database Status = OK"
         except NameError as err:
             raise
@@ -114,19 +100,7 @@ def init_db():
         # get SQLite Version
         cur.execute('SELECT SQLITE_VERSION()')
         sv = cur.fetchone()
-
-        # execute the query
-        cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
-        for row in cur.fetchall():
-            aut = row[0]
-            cop = row[1]
-            lic = row[2]
-            ver = row[3]
-            cnt = row[4]
-            sta = row[5]
-            print("Table appdata => {aut} {cop} {lic} {ver} "
-                  "{cnt} sta".format(aut=aut, cop=cop, lic=lic, ver=ver,
-                                     cnt=cnt, sta=sta))
+        print("SQLite Version => {sv}".format(sv=sv))
     # close connection
     conn.close()
 
