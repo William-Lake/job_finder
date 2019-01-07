@@ -23,8 +23,6 @@ import sqlite3
 import os
 
 import jobfinder.job_finder_props
-from jobfinder.db_util import get_db
-from jobfinder.db_util import check_db
 
 
 class Db_Connection(object):
@@ -36,9 +34,9 @@ class Db_Connection(object):
 
         self.logger.info('Connecting To DB')
 
-        self.logger.info = check_db()
+        self.logger.info = jobfinder.db_util.check_db()
 
-        self.conn = sqlite3.connect(get_db())
+        self.conn = sqlite3.connect(jobfinder.db_util.get_db())
 
     def execute_insert(self,statement,params=None):
         """Executes an INSERT on the database.

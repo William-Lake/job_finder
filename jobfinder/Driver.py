@@ -27,7 +27,7 @@ class Driver(object):
 
     DEFAULT_CONFIG_FILE = os.path.join(
         os.path.dirname(
-            os.path.abspath(__file__)), '../resources/logging.conf')
+            os.path.abspath(__file__)), 'logging.conf')
     
     def __init__(self):
 

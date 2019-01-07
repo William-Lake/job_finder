@@ -62,11 +62,11 @@ def check_db():
                     ver = row[3]
                     cnt = row[4]
                     sta = row[5]
-                    logger("DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
+                    logger.info("DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
             conn.close()
             return "Database Status = OK"
         except NameError as err:
-            logger(err)
+            logger.warning(err)
             raise
             init_db()
     else:
@@ -81,12 +81,12 @@ def init_db():
         2. Execute SQL query to create tables
         3. Add script information to appdata table
     """
-    logger("Creating New Database")
+    logger.info("Creating New Database")
 
     # get location of the sqlite init script
     SQL_FILE = os.path.join(
         os.path.dirname(
-            os.path.abspath(__file__)), '../resources/sqlite.sql')
+            os.path.abspath(__file__)), 'resources/sqlite.sql')
 
     # connect to SQLite3 database
     with sqlite3.connect(get_db()) as conn:
@@ -99,7 +99,7 @@ def init_db():
         # get SQLite Version
         cur.execute('SELECT SQLITE_VERSION()')
         sv = cur.fetchone()
-        logger("SQLite Version {0}",sv)
+        logger.info("SQLite Version {0}",sv)
 
         # execute the query
         cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
@@ -112,7 +112,7 @@ def init_db():
             sta = row[5]
 
             # log the results
-            logger("New DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
+            logger.info("New DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
 
     # close the connection
     conn.close()
@@ -133,8 +133,8 @@ def version_db():
         conn.close()
         return dbv
     except sqlite3.OperationalError as sql3_error:
-        logger(sql3_error)
-        logger("There was a problem with the DB, performing clean initialization")
+        logger.warning(sql3_error)
+        logger.warning("There was a problem with the DB, performing clean initialization")
         init_db()
 
 
@@ -142,11 +142,12 @@ def get_db():
     """Get AppData Directory based on Platform"""
     if sys.platform == 'win32':
         DB_NAME = os.path.abspath(os.path.join(
-            get_user_home(),'AppData','Local','job_finder',DATABASE)) 
+            get_user_home(),'AppData','Local','job_finder',DATABASE))
     else:
         DB_NAME = os.path.abspath(os.path.join(
             get_user_home(),'.local','share','job_finder',DATABASE))
 
+    return DB_NAME
 
 class Db_Util(object):
 
