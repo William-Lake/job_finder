@@ -54,7 +54,7 @@ class Job_Finder(object):
 
 	def start(self):
 
-		self.logger.info('Starting Job Finder')
+		self.logger.info = 'Starting Job Finder'
 
 		self.logger.debug('Parsing args.')
 
@@ -87,7 +87,7 @@ class Job_Finder(object):
 		compares them to those in the database,
 		and notifies the recipients if necessary.
 		"""
-		self.logger.info('Gathering and Reviewing Jobs')
+		self.logger.info = 'Gathering and Reviewing Jobs'
 
 		self.job_emailer = Job_Emailer()
 
@@ -120,7 +120,7 @@ class Job_Finder(object):
 		saving those that are new,
 		and deleting those that have closed.
 		"""
-		self.logger.info('Reviewing Jobs')
+		self.logger.info = 'Reviewing Jobs'
 
 		self.gather_jobs_on_site()
 
@@ -132,7 +132,7 @@ class Job_Finder(object):
 		"""Grabs the jobs from the State of MT website.
 		"""
 
-		self.logger.info('Gathering Jobs From Site')
+		self.logger.info = 'Gathering Jobs From Site'
 
 		self.jobs_on_site = []
 
@@ -195,7 +195,7 @@ class Job_Finder(object):
 
 		else:
 
-			self.logger.error('Taleo response code != 200: ' + str(response.status_code))
+			self.logger.error = 'Taleo response code != 200: ' + str(response.status_code)
 
 			# TODO: Email yourself/Bryon
 
@@ -203,7 +203,7 @@ class Job_Finder(object):
 		"""From the list of jobs that have been pulled from the web,
 		finds those that need to be saved.
 		"""
-		self.logger.info('Finding Jobs to save')
+		self.logger.info = 'Finding Jobs to save'
 
 		self.jobs_to_save = []
 
@@ -223,7 +223,7 @@ class Job_Finder(object):
 		"""From the list of jobs that have been pulled from the web,
 		finds those that need to be deleted.
 		"""
-		self.logger.info('Finding Jobs to delete')
+		self.logger.info = 'Finding Jobs to delete'
 
 		self.jobs_to_delete = []
 
@@ -260,7 +260,7 @@ class Job_Finder(object):
 		
 		if len(self.jobs_to_save) > 0 or len(self.jobs_to_delete) > 0:
 
-			self.logger.info('Notifying Recipients')
+			self.logger.info = 'Notifying Recipients'
 
 			for job in self.db_util.saved_jobs: self.job_emailer.notify_recipients_of_job(self.current_recipients,job)
 

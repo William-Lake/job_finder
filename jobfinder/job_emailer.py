@@ -16,7 +16,7 @@
 """Emails recipients about new jobs."""
 
 import os
-#import job_finder_props
+import jobfinder.job_finder_props
 import logging
 import smtplib
 from email.mime.text import MIMEText
@@ -26,6 +26,7 @@ import sys
 from .recipient import Recipient
 from .job import Job
 
+
 class Job_Emailer(object):
 
     def __init__(self):
@@ -33,15 +34,15 @@ class Job_Emailer(object):
 
         self.logger = logging.getLogger()
 
-        self.logger.info('Initializing Job Emailer')
+        self.logger.info = 'Initializing Job Emailer'
 
-        self.email = job_finder_props.EMAIL
+        self.email = jobfinder.job_finder_props.EMAIL
 
-        self.password = job_finder_props.PASSWORD
+        self.password = jobfinder.job_finder_props.PASSWORD
 
-        self.smtp = job_finder_props.SMTP
+        self.smtp = jobfinder.job_finder_props.SMTP
 
-        self.port = job_finder_props.PORT
+        self.port = jobfinder.job_finder_props.PORT
 
         # Assumed for now, no current plans to send emails with anything else.
         self.text_subtype = 'plain'
@@ -115,7 +116,7 @@ class Job_Emailer(object):
 
             smtpObj.login(user=self.email,password=self.password)
 
-            self.logger.debug('Sending to ' + email)
+            self.logger.debug = ('Sending to ' + email)
 
             smtpObj.sendmail(self.email,email, self.msg.as_string())
 
@@ -123,4 +124,4 @@ class Job_Emailer(object):
 
         except smtplib.SMTPException as err:
 
-            self.logger.exception('ERROR Unable to send email : %r' % err)
+            self.logger.exception = ('ERROR Unable to send email : %r' % err)

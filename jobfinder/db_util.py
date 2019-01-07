@@ -32,9 +32,6 @@ from .job import Job
 from .recipient import Recipient
 from .job_finder_props import get_db_name
 
-# setup the logger
-logger = logging.getLogger()
-
 DATABASE = get_db_name()
 
 def get_user_home():
@@ -62,11 +59,9 @@ def check_db():
                     ver = row[3]
                     cnt = row[4]
                     sta = row[5]
-                    logger.info("DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
             conn.close()
             return "Database Status = OK"
         except NameError as err:
-            logger.warning(err)
             raise
             init_db()
     else:
@@ -81,8 +76,6 @@ def init_db():
         2. Execute SQL query to create tables
         3. Add script information to appdata table
     """
-    logger.info("Creating New Database")
-
     # get location of the sqlite init script
     SQL_FILE = os.path.join(
         os.path.dirname(
@@ -99,7 +92,7 @@ def init_db():
         # get SQLite Version
         cur.execute('SELECT SQLITE_VERSION()')
         sv = cur.fetchone()
-        logger.info("SQLite Version {0}",sv)
+        logger.info("SQLite Version {0}".format(sv))
 
         # execute the query
         cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
@@ -110,10 +103,6 @@ def init_db():
             ver = row[3]
             cnt = row[4]
             sta = row[5]
-
-            # log the results
-            logger.info("New DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
-
     # close the connection
     conn.close()
 
@@ -133,8 +122,6 @@ def version_db():
         conn.close()
         return dbv
     except sqlite3.OperationalError as sql3_error:
-        logger.warning(sql3_error)
-        logger.warning("There was a problem with the DB, performing clean initialization")
         init_db()
 
 

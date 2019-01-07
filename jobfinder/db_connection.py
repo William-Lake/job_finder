@@ -23,6 +23,8 @@ import sqlite3
 import os
 
 import jobfinder.job_finder_props
+import jobfinder.db_util
+
 
 
 class Db_Connection(object):
@@ -32,7 +34,7 @@ class Db_Connection(object):
 
         self.logger = logging.getLogger()
 
-        self.logger.info('Connecting To DB')
+        self.logger.info = 'Connecting To DB'
 
         self.logger.info = jobfinder.db_util.check_db()
 
@@ -115,7 +117,7 @@ class Db_Connection(object):
         Keyword Arguments:
             do_commit {boolean} -- True if the database changes should be committed. (default: {False})
         """
-        self.logger.info('Closing DB Connection')
+        self.logger.info = 'Closing DB Connection'
 
         self.conn.commit()
 
