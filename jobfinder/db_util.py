@@ -17,15 +17,136 @@
 
 Manages database interactions.
 """
-
-
+import sys
 import time
 import logging
 
-# update for packaging, use . relative path identifiers
+import os
+from os.path import expanduser
+
+import sqlite3
+from sqlite3 import Error
+
 from .db_connection import Db_Connection
 from .job import Job
 from .recipient import Recipient
+from .job_finder_props import get_db_name
+
+# setup the logger
+logger = logging.getLogger()
+
+DATABASE = get_db_name()
+
+def get_user_home():
+    """Return User Home Directory"""
+    return expanduser("~")
+
+
+def check_db():
+    """Check Database Connection
+
+    Actions Performed:
+        1. Connect to database
+        2. If the database does not exist, create it with init_db()
+    """
+    if os.path.isfile(get_db()):
+        try:
+            version_db()
+            with sqlite3.connect(DB_PATH) as conn:
+                cur = conn.cursor()
+                cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
+                for row in cur.fetchall():
+                    aut = row[0]
+                    cop = row[1]
+                    lic = row[2]
+                    ver = row[3]
+                    cnt = row[4]
+                    sta = row[5]
+                    logger("DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
+            conn.close()
+            return "Database Status = OK"
+        except NameError as err:
+            logger(err)
+            raise
+            init_db()
+    else:
+        init_db()
+
+
+def init_db():
+    """Create Job Finder Database
+
+    Actions Performed:
+        1. Open SQLit3 Database connection
+        2. Execute SQL query to create tables
+        3. Add script information to appdata table
+    """
+    logger("Creating New Database")
+
+    # get location of the sqlite init script
+    SQL_FILE = os.path.join(
+        os.path.dirname(
+            os.path.abspath(__file__)), '../resources/sqlite.sql')
+
+    # connect to SQLite3 database
+    with sqlite3.connect(get_db()) as conn:
+        cur = conn.cursor()
+        fd = open(SQL_FILE, 'r')
+        script = fd.read()
+        cur.executescript(script)
+        fd.close()
+
+        # get SQLite Version
+        cur.execute('SELECT SQLITE_VERSION()')
+        sv = cur.fetchone()
+        logger("SQLite Version {0}",sv)
+
+        # execute the query
+        cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
+        for row in cur.fetchall():
+            aut = row[0]
+            cop = row[1]
+            lic = row[2]
+            ver = row[3]
+            cnt = row[4]
+            sta = row[5]
+
+            # log the results
+            logger("New DB : {0} {1} {2} {3}, {4} {5}",aut,cop,lic,ver,cnt,sta)
+
+    # close the connection
+    conn.close()
+
+
+def version_db():
+    """Get Job FinderDatabase Version
+
+    Actions Performed database
+        1. Fetch the appdata version
+    """
+    try:
+        with sqlite3.connect(get_db()) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
+            for row in cur.fetchall():
+                dbv = row[3]
+        conn.close()
+        return dbv
+    except sqlite3.OperationalError as sql3_error:
+        logger(sql3_error)
+        logger("There was a problem with the DB, performing clean initialization")
+        init_db()
+
+
+def get_db():
+    """Get AppData Directory based on Platform"""
+    if sys.platform == 'win32':
+        DB_NAME = os.path.abspath(os.path.join(
+            get_user_home(),'AppData','Local','job_finder',DATABASE)) 
+    else:
+        DB_NAME = os.path.abspath(os.path.join(
+            get_user_home(),'.local','share','job_finder',DATABASE))
+
 
 class Db_Util(object):
 

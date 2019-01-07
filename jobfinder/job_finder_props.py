@@ -1,24 +1,27 @@
-import os
-import sys
+# TODO: Create Class to handle prop additions to database via ConfigParser
+#       or database tables CRUD entries.
 
-from os.path import expanduser
+DATABASE="jobfinder.db"
+SMTP='test.server.net'
+PORT='1234'
+EMAIL='email@test.net'
+PASSWORD='password'
+DATABASE="jobfinder.db"
 
-SMTP = 'test.server.net'
-PORT = '1234'
-EMAIL = 'email@test.net'
-PASSWORD = 'password'
+# Methods used for testing only. Remove after Class for props is setup properly
+def get_db_name():
+    return DATABASE
 
-def get_user_home():
-    """Return User Home Directory"""
-    return expanduser("~")
+def get_smtp():
+    return SMTP
 
-def get_db():
-    """Get AppData Directory based on Platform"""
-    if sys.platform == 'win32':
-        DB_NAME = os.path.abspath(os.path.join(
-            get_user_home(),'AppData','local','job_finder','Helena_Jobs.db')) 
-    else:
-        DB_NAME = os.path.abspath(os.path.join(
-            get_user_home(),'.local','share','job_finder','Helena_Jobs.db')) 
+def get_port():
+    return PORT
 
-    return DB_NAME
+def get_email():
+    return EMAIL
+
+def get_password():
+    return PASSWORD
+
+# END job_finder_props

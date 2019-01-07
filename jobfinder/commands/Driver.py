@@ -25,8 +25,9 @@ from ..job_finder import Job_Finder
 
 class Driver(object):
 
-    # update for using pkgutil
-    DEFAULT_CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../resources/logging.conf')
+    DEFAULT_CONFIG_FILE = os.path.join(
+        os.path.dirname(
+            os.path.abspath(__file__)), '../resources/logging.conf')
     
     def __init__(self):
 

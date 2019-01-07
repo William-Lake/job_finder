@@ -1,3 +1,20 @@
+CREATE TABLE appdata(
+    author      TEXT,
+    copyright   TEXT,
+    license     TEXT,
+    version     TEXT,
+    email       TEXT,
+    status      TEXT
+);
+INSERT INTO appdata(author,copyright,license,version,email,status) VALUES
+    ('Job Finder ',
+    '2019',
+    'GPLv3',
+    '0.0.1',
+    'ki7mt@yahoo.com',
+    'Development'
+);
+
 CREATE TABLE recipient
 (
     id INTEGER PRIMARY KEY,

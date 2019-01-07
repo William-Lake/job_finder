@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2018 William Lake
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,21 +22,23 @@ import logging
 import sqlite3
 import os
 
-# update for packaging, use . relative path identifiers
-import job_finder_props
+import jobfinder.job_finder_props
+from jobfinder.db_util import get_db
+from jobfinder.db_util import check_db
+
 
 class Db_Connection(object):
 
     def __init__(self):
         """Constructor"""
+
         self.logger = logging.getLogger()
 
         self.logger.info('Connecting To DB')
 
-        #current_dir = os.path.dirname(os.path.abspath(__file__))
-        DB_NAME = get_db()
+        self.logger.info = check_db()
 
-        self.conn = sqlite3.connect(os.path.join(DB_NAME))
+        self.conn = sqlite3.connect(get_db())
 
     def execute_insert(self,statement,params=None):
         """Executes an INSERT on the database.

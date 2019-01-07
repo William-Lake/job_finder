@@ -15,27 +15,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #-------------------------------------------------------------------------------
-# Developer Notes:
-#
-#  package_data allows access to package resources outside the MANIFEST.in
-#  listing.  
-#  
-#  Use pkgutil for accessing jobs/resources/*.*
-# 
-#  Usage: pkgutil.get_data(package, resource)
-#
-#  Example:
-# 
-#  import pkgutil
-#  data = pkgutil.get_data("jobfinder", "resources/logging.conf")
-#  sql1  = pkgutil.get_data("jobfinder", "resources/sqlite.sql")
-#  sql2  = pkgutil.get_data("jobfinder", "resources/postgresql.sql")
-#
-#  Additional resource vars can be added as needed.
-#
-#  See Also: https://docs.python.org/3.7/library/pkgutil.html
-#
-#-------------------------------------------------------------------------------
 import os
 import setuptools
 
