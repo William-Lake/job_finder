@@ -26,8 +26,7 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
 ## Getting started
 
 1. Open a Command Line/Terminal Session
-1. Ensure you have python 3 installed before continuing. If not
-1. [get it installed](https://wiki.python.org/moin/BeginnersGuide/Download).
+1. Ensure you have python 3 installed before continuing. If not [get it installed](https://wiki.python.org/moin/BeginnersGuide/Download).
 
     ```shell
     python --version
