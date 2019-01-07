@@ -17,19 +17,24 @@
 
 import sys
 import os
-from datetime import datetime
 import logging
-import pkgutil
+
+import jobfinder.db_util
+from jobfinder.db_util import check_db
+
 from logging.config import fileConfig
 from .job_finder import Job_Finder
 
-class Driver(object):
 
+class Driver(object):
     DEFAULT_CONFIG_FILE = os.path.join(
         os.path.dirname(
             os.path.abspath(__file__)), 'logging.conf')
-    
+
     def __init__(self):
+
+        # Always check the DB first before any actions to help prevent errors
+        self.checkdb = check_db()
 
         self.load_configuration()
 
@@ -41,13 +46,14 @@ class Driver(object):
 
             self.job_finder.start()
 
-        except Exception as err: 
+        except Exception as err:
 
-            self.logger.exception('There was an error during job_finder execution: %r' % err)
+            self.logger.exception(
+                'There was an error during job_finder execution: %r' % err)
 
         if self.job_finder.conn_closed == False: self.job_finder.db_util.close_connection()
 
-    def load_configuration(self,config_file=DEFAULT_CONFIG_FILE):
+    def load_configuration(self, config_file=DEFAULT_CONFIG_FILE):
         """
         Loads logging configuration from the given configuration file.
 
@@ -60,7 +66,6 @@ class Driver(object):
         :type config_file: str
         """
         if not os.path.exists(config_file) or not os.path.isfile(config_file):
-
             msg = '%s configuration file does not exist!', config_file
 
             logging.getLogger().error(msg)
@@ -70,11 +75,13 @@ class Driver(object):
         try:
             fileConfig(config_file, disable_existing_loggers=False)
 
-            logging.getLogger().info('%s configuration file was loaded.', config_file)
+            logging.getLogger().info('%s configuration file was loaded.',
+                                     config_file)
 
         except Exception as e:
 
-            logging.getLogger().error('Failed to load configuration from %s!', config_file)
+            logging.getLogger().error('Failed to load configuration from %s!',
+                                      config_file)
 
             logging.getLogger().debug(str(e), exc_info=True)
 
@@ -105,6 +112,6 @@ class Driver(object):
 
         return args
 
-if __name__ == '__main__': 
 
+if __name__ == '__main__':
     driver = Driver()

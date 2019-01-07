@@ -20,11 +20,9 @@ centralizing transactions and management.
 """
 import logging
 import sqlite3
-import os
 
 import jobfinder.job_finder_props
 import jobfinder.db_util
-
 
 
 class Db_Connection(object):
@@ -33,14 +31,11 @@ class Db_Connection(object):
         """Constructor"""
 
         self.logger = logging.getLogger()
-
-        self.logger.info = 'Connecting To DB'
-
-        self.logger.info = jobfinder.db_util.check_db()
-
+        self.logger.info(jobfinder.db_util.check_db())
+        self.logger.info('Connecting To DB')
         self.conn = sqlite3.connect(jobfinder.db_util.get_db())
 
-    def execute_insert(self,statement,params=None):
+    def execute_insert(self, statement, params=None):
         """Executes an INSERT on the database.
         
         Arguments:
@@ -50,9 +45,9 @@ class Db_Connection(object):
             params {list} -- The parameters to use when executing the SQL statement. (default: {None})
         """
 
-        self.execute_statement(statement,params)
+        self.execute_statement(statement, params)
 
-    def execute_select(self,statement,params=None):
+    def execute_select(self, statement, params=None):
         """Executes a SELECT statement on the database, returning the results.
         
         Arguments:
@@ -65,13 +60,15 @@ class Db_Connection(object):
             list -- The results of the given SQL SELECT statement.
         """
 
-        if params == None: results = self.conn.execute(statement)
+        if params == None:
+            results = self.conn.execute(statement)
 
-        else: results = self.conn.execute(statement,params)
+        else:
+            results = self.conn.execute(statement, params)
 
         return results
 
-    def execute_update(self,statement,params=None):
+    def execute_update(self, statement, params=None):
         """Executes an UPDATE statement on the database.
         
         Arguments:
@@ -81,9 +78,9 @@ class Db_Connection(object):
             params {list} -- The parameters to use when executing the SQL statement. (default: {None})
         """
 
-        self.execute_statement(statement,params)
+        self.execute_statement(statement, params)
 
-    def execute_delete(self,statement,params=None):
+    def execute_delete(self, statement, params=None):
         """Executes a DELETE statement on the database.
         
         Arguments:
@@ -93,9 +90,9 @@ class Db_Connection(object):
             params {list} -- The parameters to use when executing the SQL statement. (default: {None})
         """
 
-        self.execute_statement(statement,params)
+        self.execute_statement(statement, params)
 
-    def execute_statement(self,statement,params=None):
+    def execute_statement(self, statement, params=None):
         """Executes the given statement on the database.
         
         Arguments:
@@ -105,9 +102,11 @@ class Db_Connection(object):
             params {list} -- The parameters to use when executing the SQL statement.. (default: {None})
         """
 
-        if params == None: self.conn.execute(statement)
+        if params == None:
+            self.conn.execute(statement)
 
-        else: self.conn.execute(statement,params)
+        else:
+            self.conn.execute(statement, params)
 
         self.conn.commit()
 
@@ -117,8 +116,6 @@ class Db_Connection(object):
         Keyword Arguments:
             do_commit {boolean} -- True if the database changes should be committed. (default: {False})
         """
-        self.logger.info = 'Closing DB Connection'
-
+        self.logger.info='Closing db'
         self.conn.commit()
-
         self.conn.close()

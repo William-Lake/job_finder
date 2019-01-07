@@ -19,9 +19,10 @@ Recipient
 Represents a recipient of new job notifications.
 """
 
+
 class Recipient(object):
 
-    def __init__(self,recipient_id,email,date_added):
+    def __init__(self, recipient_id, email, date_added):
         """Constructor
         
         Arguments:
