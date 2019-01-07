@@ -21,9 +21,11 @@ Manages database interactions.
 
 import time
 import logging
-from db_connection import Db_Connection
-from job import Job
-from recipient import Recipient
+
+# update for packaging, use . relative path identifiers
+from .db_connection import Db_Connection
+from .job import Job
+from .recipient import Recipient
 
 class Db_Util(object):
 

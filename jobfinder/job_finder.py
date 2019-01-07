@@ -30,10 +30,12 @@ import time
 import urllib
 import sqlite3
 import logging
-from db_util import Db_Util
-from job import Job
-from recipient import Recipient
-from job_emailer import Job_Emailer
+
+# update for packaging, use . relative path identifiers
+from .db_util import Db_Util
+from .job import Job
+from .recipient import Recipient
+from .job_emailer import Job_Emailer
 
 class Job_Finder(object):
 

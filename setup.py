@@ -74,7 +74,7 @@ setuptools.setup(
         ]
     },
     entry_points={
-    'console_scripts': ['jobfinder = jobfinder.commands.Driver:main'],
+    'console_scripts': ['jobfinder = jobfinder.commands.Driver:Driver'],
     },
     zip_safe=False,
     classifiers=[

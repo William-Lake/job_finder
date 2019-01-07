@@ -16,13 +16,15 @@
 """Emails recipients about new jobs."""
 
 import os
-import job_finder_props
+#import job_finder_props
 import logging
 import smtplib
 from email.mime.text import MIMEText
 import sys
-from recipient import Recipient
-from job import Job
+
+# update for packaging, use . relative path identifiers
+from .recipient import Recipient
+from .job import Job
 
 class Job_Emailer(object):
 

@@ -19,13 +19,15 @@ import sys
 import os
 from datetime import datetime
 import logging
+import pkgutil
 from logging.config import fileConfig
-from jobfinder import Job_Finder
+from ..job_finder import Job_Finder
 
 class Driver(object):
 
-    DEFAULT_CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logging.conf')
-
+    # update for using pkgutil
+    DEFAULT_CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../resources/logging.conf')
+    
     def __init__(self):
 
         self.load_configuration()

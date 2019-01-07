@@ -22,6 +22,8 @@ centralizing transactions and management.
 import logging
 import sqlite3
 import os
+
+# update for packaging, use . relative path identifiers
 import job_finder_props
 
 class Db_Connection(object):
@@ -32,9 +34,10 @@ class Db_Connection(object):
 
         self.logger.info('Connecting To DB')
 
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        #current_dir = os.path.dirname(os.path.abspath(__file__))
+        DB_NAME = get_db()
 
-        self.conn = sqlite3.connect(os.path.join(current_dir,job_finder_props.DB_NAME))
+        self.conn = sqlite3.connect(os.path.join(DB_NAME))
 
     def execute_insert(self,statement,params=None):
         """Executes an INSERT on the database.
