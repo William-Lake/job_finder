@@ -57,7 +57,7 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
 
 ## Usage
 
-The entry for for the applications is `jobfinder`, the purpose of which is is to manage interaction with the the parser, recipient, and database interface.
+The entry point for the application is aptly called, `jobfinder`. The purpose of this script is to manage interaction with the parser, recipient, and smtp email-sender.
 
 ### Using the Driver script
 
