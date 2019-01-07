@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2018 William Lake
+# Copyright (C) 2019 William Lake, Greg Beam
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,30 +13,18 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""
-Job
+_all__ = (
+    "__title__", "__summary__", "__uri__", "__version__", "__author__",
+    "__email__", "__license__", "__copyright__",
+)
 
-Represents an IT Job found in Helena, MT.
+__title__ = "jobfinder"
+__summary__ = "Python app to gather State of Montana IT jobs in Helena, MT."
+__uri__ = "https://github.com/KI7MT/job_finder/"
+__version__ = "0.1.0"
 
-"""
+__author__ = "William Lake"
+__email__ = ""
 
-class Job(object):
-
-    def __init__(self,job_id,site_id,contest_num,title,dept,site_url):
-        """Constructor
-        
-        Arguments:
-            job_data {list} -- The list of job data to use when building this job object.
-        """
-
-        self.job_id = job_id
-
-        self.site_id = site_id
-
-        self.contest_num = contest_num
-
-        self.title = title
-
-        self.dept = dept
-
-        self.site_url = site_url
+__license__ = "GPLv3"
+__copyright__ = "Copyright 2019 William Lake, Greg Beam and contributors"
