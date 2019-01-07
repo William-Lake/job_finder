@@ -21,7 +21,7 @@ from datetime import datetime
 import logging
 import pkgutil
 from logging.config import fileConfig
-from ..job_finder import Job_Finder
+from .job_finder import Job_Finder
 
 class Driver(object):
 
