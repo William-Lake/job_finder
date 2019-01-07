@@ -63,7 +63,6 @@ setuptools.setup(
         'requests',
         'lxml',
         'psycopg2',
-        'sqlite3',
         'pkgutil'
     ],
     package_data={
