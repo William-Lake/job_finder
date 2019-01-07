@@ -67,7 +67,6 @@ CREATE TABLE jobs.database_info
     last_update DATE,
     CONSTRAINT database_info_id_pkey PRIMARY KEY (id)
 );
-
 INSERT INTO rdaas.database_info (id, author, db_version, last_update)
 VALUES(1, 'Greg Beam', '1.0.0', '2019-1-6');
 
@@ -112,7 +111,7 @@ CREATE TABLE jobs.prop
     id SERIAL,
     smtp VARCHAR (120) NOT NULL,
     port INTEGER NOT NULL,
-    password VARCHAR NOT NULL,
+    pword VARCHAR NOT NULL,
     is_selected BOOLEAN NOT NULL DEFAULT '0',
     CONSTRAINT prop_id_pkey PRIMARY KEY (id)
 );

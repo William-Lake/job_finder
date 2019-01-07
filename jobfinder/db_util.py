@@ -59,6 +59,9 @@ def check_db():
         1. Connect to database
         2. If the database does not exist, create it with init_db()
 
+    Returns
+        Tuple from the first row in DB
+
     """
     if os.path.isfile(get_db()):
         try:
@@ -150,8 +153,9 @@ def get_props():
 def version_db():
     """Get Job FinderDatabase Version
 
-    Actions Performed database
-        1. Fetch the appdata version
+    Retruns
+        Tuple row from appdata
+
     """
     dbv = ""
     try:
@@ -255,7 +259,7 @@ class Db_Util(object):
         self.saved_jobs = jobs_to_save
 
         for job in jobs_to_save:
-            statement = 'INSERT INTO job (id,site_id,contest_num,title,dept,site_url,date_opened) VALUES (?,?,?,?,?,?,?)'
+            statement = 'INSERT INTO job (id, site_id, contest_num, title,dept,site_url,date_opened) VALUES (?,?,?,?,?,?,?)'
 
             params = (
             job.job_id, job.site_id, job.contest_num, job.title, job.dept,

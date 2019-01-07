@@ -63,4 +63,17 @@ CREATE OR REPLACE VIEW jobs.open_job_view AS
     WHERE job.closed_date = NULL
     ORDER BY jobs.job.date_opened;
 
+-- View  : jobs.props_view
+-- Usage : select * from jobs.props_view
+\echo 'jobs.open_job_view'
+CREATE OR REPLACE VIEW jobs.props_view AS
+    SELECT 
+        job.smtp AS "SMTP",
+        job.port AS "Port",
+        job.email AS "Email",
+        job.pword AS "Password"
+    FROM jobs.props
+    ORDER BY jobs.email;
+
+
 -- END view creation
