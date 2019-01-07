@@ -32,8 +32,7 @@ setuptools.setup(
     author_email=jobfinder.__email__,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    include_package_data=True
-
+    include_package_data=True,
     python_requires='>=3.5.*',
     project_urls={
         'Packaging tutorial': 'https://packaging.python.org/tutorials/distributing-packages/',
