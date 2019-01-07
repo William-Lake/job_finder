@@ -32,6 +32,7 @@ setuptools.setup(
     author_email=jobfinder.__email__,
     long_description=long_description,
     long_description_content_type="text/markdown",
+    include_package_data=True
 
     python_requires='>=3.5.*',
     project_urls={
@@ -45,7 +46,7 @@ setuptools.setup(
         'psycopg2'
     ],
     entry_points={
-    'console_scripts': ['jobfinder = jobfinder.common.Driver:main'],
+    'console_scripts': ['jobfinder = jobfinder.commands.Driver:main'],
     },
     classifiers=[
         "Natural Language :: English",
