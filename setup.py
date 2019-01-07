@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2019 William Lake, William lake
+# Copyright (C) 2019 William Lake, Greg Beam
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +13,23 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#-------------------------------------------------------------------------------
+# Developer Notes:
+#
+#  package_data allows access to package resources outside the MANIFEST.in
+#  listing.  
+#  
+#  To use pkgutil for access the jobs/resources/*.*, use the following
+# 
+#  import pkgutil
+#  data = pkgutil.get_data("jobfinder", "resources/logging.conf")
+#
+#  Additional resource vars can be added as needed.
+#
+#  See Also: https://docs.python.org/3.7/library/pkgutil.html
+#
+#-------------------------------------------------------------------------------
 import os
 import setuptools
 
@@ -42,7 +59,8 @@ setuptools.setup(
         'requests',
         'lxml',
         'psycopg2',
-        'sqlite3'
+        'sqlite3',
+        'pkgutil'
     ],
     package_data={
         'jobfinder': [
@@ -69,4 +87,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3.7",
         ],
     url='https://github.com/KI7MT/job_finder',
+    zip_safe=False,
 )
