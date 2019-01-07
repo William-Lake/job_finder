@@ -28,7 +28,6 @@ setuptools.setup(
     version=jobfinder.__version__,
     author=jobfinder.__author__,
     license=jobfinder.__license__,
-    copyright=jobfinder.__copyright__,
     author_email=jobfinder.__email__,
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -44,6 +43,13 @@ setuptools.setup(
         'lxml',
         'psycopg2'
     ],
+    package_data={
+        'jobfinder': [
+            'resources/*.sql',
+            'resources/*.csv',
+            'reources/*.conf',
+        ]
+    },
     entry_points={
     'console_scripts': ['jobfinder = jobfinder.commands.Driver:main'],
     },

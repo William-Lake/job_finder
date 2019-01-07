@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 _all__ = (
     "__title__", "__summary__", "__uri__", "__version__", "__author__",
-    "__email__", "__license__", "__copyright__",
+    "__email__", "__license__"
 )
 
 __title__ = "jobfinder"
@@ -23,8 +23,7 @@ __summary__ = "Python app to gather State of Montana IT jobs in Helena, MT."
 __uri__ = "https://github.com/KI7MT/job_finder/"
 __version__ = "0.1.0"
 
-__author__ = "William Lake"
-__email__ = ""
+__author__ = "Greg Beam"
+__email__ = "ki7mt@yahoo.com"
 
 __license__ = "GPLv3"
-__copyright__ = "Copyright 2019 William Lake, Greg Beam and contributors"
