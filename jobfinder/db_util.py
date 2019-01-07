@@ -52,7 +52,7 @@ def check_db():
     if os.path.isfile(get_db()):
         try:
             version_db()
-            with sqlite3.connect(DB_PATH) as conn:
+            with sqlite3.connect(get_db()) as conn:
                 cur = conn.cursor()
                 cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
                 for row in cur.fetchall():
