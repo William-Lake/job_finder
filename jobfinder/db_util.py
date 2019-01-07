@@ -17,23 +17,20 @@
 
 Manages database interactions.
 """
+import logging
+import os
+import shutil
+import sqlite3
 import sys
 import time
-import logging
-import shutil
-
-import os
 from os.path import expanduser
-
-import sqlite3
-from sqlite3 import Error
 
 from .db_connection import Db_Connection
 from .job import Job
 from .recipient import Recipient
 
 # This variable should comde from __init__.py but it's not working yet.
-DATABASE='jobfinder.db'
+DATABASE = 'jobfinder.db'
 
 
 def get_user_home():
@@ -42,6 +39,7 @@ def get_user_home():
 
 
 def make_dirs():
+    """Make directory for the Database"""
     if sys.platform == 'win32':
         location = os.path.abspath(os.path.join(
             get_user_home(), 'AppData', 'Local', 'jobfinder'))
@@ -52,7 +50,6 @@ def make_dirs():
     if os.path.exists(location):
         shutil.rmtree(location)
     os.makedirs(location)
-
 
 
 def check_db():
@@ -76,11 +73,13 @@ def check_db():
                     ver = row[3]
                     cnt = row[4]
                     sta = row[5]
+                    print("Table appdata => {aut} {cop} {lic} {ver} "
+                          "{cnt} sta".format(aut=aut, cop=cop, lic=lic, ver=ver,
+                                             cnt=cnt, sta=sta))
             conn.close()
             return "Database Status = OK"
         except NameError as err:
             raise
-            init_db()
     else:
         init_db()
 
@@ -122,7 +121,10 @@ def init_db():
             ver = row[3]
             cnt = row[4]
             sta = row[5]
-    # close the connection
+            print("Table appdata => {aut} {cop} {lic} {ver} "
+                  "{cnt} sta".format(aut=aut, cop=cop, lic=lic, ver=ver,
+                                     cnt=cnt, sta=sta))
+    # close connection
     conn.close()
 
 
@@ -151,6 +153,7 @@ def version_db():
     Actions Performed database
         1. Fetch the appdata version
     """
+    dbv = ""
     try:
         with sqlite3.connect(get_db()) as conn:
             cur = conn.cursor()
