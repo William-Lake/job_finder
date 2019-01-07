@@ -29,7 +29,7 @@
 #  sql1  = pkgutil.get_data("jobfinder", "resources/sqlite.sql")
 #  sql2  = pkgutil.get_data("jobfinder", "resources/postgresql.sql")
 #
-#  Additional resources vars can be added as needed.
+#  Additional resource vars can be added as needed.
 #
 #  See Also: https://docs.python.org/3.7/library/pkgutil.html
 #
@@ -91,5 +91,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3.7",
         ],
     url='https://github.com/KI7MT/job_finder',
-    zip_safe=False,
+    zip_safe=False
 )
