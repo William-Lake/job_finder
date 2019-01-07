@@ -20,10 +20,14 @@
 #  package_data allows access to package resources outside the MANIFEST.in
 #  listing.  
 #  
-#  To use pkgutil for access the jobs/resources/*.*, use the following
+#  Use pkgutil for accessing jobs/resources/*.*
+#
+#  Example:
 # 
 #  import pkgutil
 #  data = pkgutil.get_data("jobfinder", "resources/logging.conf")
+#  sql1  = pkgutil.get_data("jobfinder", "resources/sqlite.sql")
+#  sql2  = pkgutil.get_data("jobfinder", "resources/postgresql.sql")
 #
 #  Additional resource vars can be added as needed.
 #
