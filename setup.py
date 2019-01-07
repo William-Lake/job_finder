@@ -76,6 +76,7 @@ setuptools.setup(
     entry_points={
     'console_scripts': ['jobfinder = jobfinder.commands.Driver:main'],
     },
+    zip_safe=False,
     classifiers=[
         "Natural Language :: English",
         "Development Status :: 2 - Pre-Alpha",
@@ -91,5 +92,4 @@ setuptools.setup(
         "Programming Language :: Python :: 3.7",
         ],
     url='https://github.com/KI7MT/job_finder',
-    zip_safe=False
 )
