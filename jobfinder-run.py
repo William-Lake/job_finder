@@ -4,7 +4,7 @@
 """Wrapper for running jobfinder directly from source tree."""
 
 
-from jobfinder.jobfinder import main
+from jobfinder.driver import main
 
 
 if __name__ == '__main__':
