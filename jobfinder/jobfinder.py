@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2018 William Lake
+# Copyright (C) 2018 William Lake, Greg Beam
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""Driver class, manages the job_finder utility."""
+"""Main Class for job_finder utility."""
 
 import sys
 import os
@@ -24,6 +24,22 @@ from jobfinder.db_util import check_db
 
 from logging.config import fileConfig
 from .job_finder import Job_Finder
+
+# meta data
+_all__ = (
+    "__title__", "__summary__", "__uri__", "__version__", "__author__",
+    "__email__", "__license__"
+)
+
+__title__ = "jobfinder"
+__summary__ = "Python app to gather State of Montana IT jobs in Helena, MT."
+__uri__ = "https://github.com/KI7MT/job_finder/"
+__version__ = "0.1.0"
+
+__author__ = "Greg Beam"
+__email__ = "ki7mt@yahoo.com"
+
+__license__ = "GPLv3"
 
 
 class Driver(object):
@@ -113,5 +129,9 @@ class Driver(object):
         return args
 
 
-if __name__ == '__main__':
+def main():
     driver = Driver()
+
+
+if __name__ == '__main__':
+    main()
