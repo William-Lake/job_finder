@@ -21,6 +21,8 @@
 #  listing.  
 #  
 #  Use pkgutil for accessing jobs/resources/*.*
+# 
+#  Usage: pkgutil.get_data(package, resource)
 #
 #  Example:
 # 
@@ -63,7 +65,6 @@ setuptools.setup(
         'requests',
         'lxml',
         'psycopg2',
-        'pkgutil'
     ],
     package_data={
         'jobfinder': [
