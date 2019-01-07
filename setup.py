@@ -29,7 +29,7 @@
 #  sql1  = pkgutil.get_data("jobfinder", "resources/sqlite.sql")
 #  sql2  = pkgutil.get_data("jobfinder", "resources/postgresql.sql")
 #
-#  Additional resource vars can be added as needed.
+#  Additional resources vars can be added as needed.
 #
 #  See Also: https://docs.python.org/3.7/library/pkgutil.html
 #
