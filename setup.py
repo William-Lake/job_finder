@@ -53,7 +53,7 @@ setuptools.setup(
         ]
     },
     entry_points={
-    'console_scripts': ['jobfinder = jobfinder.commands.Driver:Driver'],
+    'console_scripts': ['jobfinder = jobfinder.Driver:Driver'],
     },
     zip_safe=False,
     classifiers=[
