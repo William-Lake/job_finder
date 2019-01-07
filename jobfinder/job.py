@@ -20,9 +20,10 @@ Represents an IT Job found in Helena, MT.
 
 """
 
+
 class Job(object):
 
-    def __init__(self,job_id,site_id,contest_num,title,dept,site_url):
+    def __init__(self, job_id, site_id, contest_num, title, dept, site_url):
         """Constructor
         
         Arguments:

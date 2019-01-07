@@ -33,3 +33,12 @@ CREATE TABLE job
     date_opened INTEGER,
     date_closed INTEGER
 );
+
+CREATE TABLE props
+(
+    id INTEGER PRIMARY KEY,
+    smtp VARCHAR(120) NOT NULL,
+    port INTEGER NOT NULL,
+    email VARCHAR(120) NOT NULL,
+    pword VARCHAR(120) NOT NULL
+);
