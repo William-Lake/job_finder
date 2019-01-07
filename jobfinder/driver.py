@@ -25,23 +25,6 @@ from jobfinder.db_util import check_db
 from logging.config import fileConfig
 from .job_finder import Job_Finder
 
-# meta data
-_all__ = (
-    "__title__", "__summary__", "__uri__", "__version__", "__author__",
-    "__email__", "__license__"
-)
-
-__title__ = "jobfinder"
-__summary__ = "Python app to gather State of Montana IT jobs in Helena, MT."
-__uri__ = "https://github.com/KI7MT/job_finder/"
-__version__ = "0.1.0"
-
-__author__ = "Greg Beam"
-__email__ = "ki7mt@yahoo.com"
-
-__license__ = "GPLv3"
-
-
 class Driver(object):
     DEFAULT_CONFIG_FILE = os.path.join(
         os.path.dirname(
