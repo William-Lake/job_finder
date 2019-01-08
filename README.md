@@ -1,5 +1,7 @@
 # Job Finder
 
+>Original Author | Credit : [William Lake](https://github.com/William-Lake/job_finder)
+
 A set of python scripts built to gather State of Montana IT jobs in Helena, MT on behalf of students in the UM Helena IT department, notifying them of a new job if one appears.
 
 Job data gathered from the State of Montana's [central job site](https://mtstatejobs.taleo.net/careersection/200/jobsearch.ftl?lang=en).

@@ -1,14 +1,14 @@
 /* 
   
-  Project .............: Job Finder
-  Author ..............: Greg, Beam, KI7MT, <ki7mt@yahoo.com>
-  Copyright ...........: Copyright (C) 2019 Greg Beam, KI7MT
-  License .............: GPL-3
+    Project .............: Job Finder
+    Author ..............: William, Lake, Greg Beam
+    Copyright ...........: Copyright (C) 2019 William Lake, Greg Beam
+    License .............: GPL-3
 
-  File ................: postgresql_view.sql
-  Description .........: Views for Job FInder job.<schema>
-  Database Type .......: PostgreSQL v10 or later
-  Version .............: 1.0.0
+    File ................: postgresql_view.sql
+    Description .........: Views for Job FInder job.<schema>
+    Database Type .......: PostgreSQL v10 or later
+    Version .............: 1.0.0
 
 */
 
