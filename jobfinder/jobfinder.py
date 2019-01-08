@@ -23,7 +23,7 @@ import jobfinder.db_util
 from jobfinder.db_util import check_db
 
 from logging.config import fileConfig
-from .job_finder import Job_Finder
+from .finder import Job_Finder
 
 class Driver(object):
     DEFAULT_CONFIG_FILE = os.path.join(

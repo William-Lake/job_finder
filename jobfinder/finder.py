@@ -32,10 +32,10 @@ import sqlite3
 import logging
 
 # update for packaging, use . relative path identifiers
-from .db_util import Db_Util
+from .dbutil import Dbutil
 from .job import Job
 from .recipient import Recipient
-from .emailer import Job_Emailer
+from .emailer import Emailer
 
 
 class Job_Finder(object):
@@ -47,7 +47,7 @@ class Job_Finder(object):
 
         self.logger.info('Initializing Job Finder')
 
-        self.db_util = Db_Util()
+        self.dbutil = Dbutil()
 
         self.conn_closed = False
 
@@ -77,7 +77,7 @@ class Job_Finder(object):
                     self.add_recipients(target)
 
                 else:
-                    self.db_util.add_recipient(target)
+                    self.dbutil.add_recipient(target)
 
             elif self.args[0].upper().strip() == 'REMOVE':
 
@@ -85,7 +85,7 @@ class Job_Finder(object):
                     self.remove_recipients(target)
 
                 else:
-                    self.db_util.remove_recipient(target)
+                    self.dbutil.remove_recipient(target)
 
     def gather_and_review_jobs(self):
         """Gathers the jobs from the web,
@@ -94,11 +94,11 @@ class Job_Finder(object):
         """
         self.logger.info('Gathering and Reviewing Jobs')
 
-        self.job_emailer = Job_Emailer()
+        self.emailer = Emailer()
 
-        self.current_recipients = self.db_util.gather_current_recipients()
+        self.current_recipients = self.dbutil.gather_current_recipients()
 
-        self.current_jobs = self.db_util.gather_current_jobs()
+        self.current_jobs = self.dbutil.gather_current_jobs()
 
         self.review_jobs()
 
@@ -110,7 +110,7 @@ class Job_Finder(object):
 
         emails = open(file_name).readlines()
 
-        for email in emails: self.db_util.add_recipient(email.strip())
+        for email in emails: self.dbutil.add_recipient(email.strip())
 
     def remove_recipients(self, file_name):
 
@@ -118,7 +118,7 @@ class Job_Finder(object):
 
         emails = open(file_name).readlines()
 
-        for email in emails: self.db_util.remove_recipient(email.strip())
+        for email in emails: self.dbutil.remove_recipient(email.strip())
 
     def review_jobs(self):
         """Gathers all the jobs from the State of MT jobs site,
@@ -250,7 +250,7 @@ class Job_Finder(object):
         self.logger.debug(
             'Found {} Jobs To Save'.format(len(self.jobs_to_save)))
 
-        if len(self.jobs_to_save) > 0: self.db_util.save_jobs(self.jobs_to_save)
+        if len(self.jobs_to_save) > 0: self.dbutil.save_jobs(self.jobs_to_save)
 
     def delete_jobs(self):
         """From the list of jobs that have been pulled from the web,
@@ -269,7 +269,7 @@ class Job_Finder(object):
             'Found {} Jobs to Delete'.format(len(self.jobs_to_delete)))
 
         if len(self.jobs_to_delete) > 0:
-            self.db_util.delete_jobs(self.jobs_to_delete)
+            self.dbutil.delete_jobs(self.jobs_to_delete)
 
     def gather_job_ids(self, jobs):
         """Creates a list of job ids from a given list of jobs.
@@ -295,8 +295,8 @@ class Job_Finder(object):
 
             self.logger.info='Notifying Recipients'
 
-            for job in self.db_util.saved_jobs: self.job_emailer.notify_recipients_of_job(
+            for job in self.dbutil.saved_jobs: self.emailer.notify_recipients_of_job(
                 self.current_recipients, job)
 
-            for job in self.db_util.deleted_jobs: self.job_emailer.notify_recipients_of_job(
+            for job in self.dbutil.deleted_jobs: self.emailer.notify_recipients_of_job(
                 self.current_recipients, job, False)

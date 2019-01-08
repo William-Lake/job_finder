@@ -22,7 +22,7 @@ from email.mime.text import MIMEText
 import jobfinder.dbutil.Dbutil.get_props as get_props
 
 
-class Job_Emailer(object):
+class Emailer(object):
 
     def __init__(self):
         """Constructor"""
