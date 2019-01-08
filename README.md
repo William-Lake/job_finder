@@ -27,6 +27,11 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
 
 ## Getting started
 
+>NOTE: This process is to be used during development. When the package is ready
+> for General Availability to the public, a standard `pip install <package-name>`
+> will be used rather than the `-e .` convention. Likewise, there will be no
+> need to clone the repository beforehand.
+
 1. Open a Command Line/Terminal Session
 1. Ensure you have python 3 installed before continuing. If not [get it installed](https://wiki.python.org/moin/BeginnersGuide/Download).
 
