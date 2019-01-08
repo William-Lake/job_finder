@@ -3,3 +3,4 @@ include README.md
 include AUTHORS
 include REQUIREMENTS.txt
 include jobfinder/resources/*.*
+include jobfinder/logging.conf
