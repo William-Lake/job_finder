@@ -19,7 +19,8 @@ import logging
 import smtplib
 from email.mime.text import MIMEText
 
-from jobfinder.db_util import get_props
+import jobfinder.dbutil.Dbutil.get_props as get_props
+
 
 class Job_Emailer(object):
 

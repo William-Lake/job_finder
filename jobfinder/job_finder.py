@@ -35,7 +35,7 @@ import logging
 from .db_util import Db_Util
 from .job import Job
 from .recipient import Recipient
-from .job_emailer import Job_Emailer
+from .emailer import Job_Emailer
 
 
 class Job_Finder(object):
