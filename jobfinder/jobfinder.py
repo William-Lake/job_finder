@@ -13,17 +13,16 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""Main Class for job_finder utility."""
+"""Main Class for finder utility."""
 
 import sys
 import os
 import logging
 
-import jobfinder.db_util
-from jobfinder.db_util import check_db
-
 from logging.config import fileConfig
-from .finder import Job_Finder
+from jobfinder import finder
+from jobfinder import dbutil
+
 
 class Driver(object):
     DEFAULT_CONFIG_FILE = os.path.join(
@@ -33,24 +32,25 @@ class Driver(object):
     def __init__(self):
 
         # Always check the DB first before any actions to help prevent errors
-        self.checkdb = check_db()
+        self.checkdb = dbutil.Dbutil.check_db()
 
         self.load_configuration()
 
         self.logger = logging.getLogger()
 
-        self.job_finder = Job_Finder(self.gather_arguments())
+        self.finder = finder.Finder(self.gather_arguments())
 
         try:
 
-            self.job_finder.start()
+            self.finder.start()
 
         except Exception as err:
 
             self.logger.exception(
-                'There was an error during job_finder execution: %r' % err)
+                'There was an error during finder execution: %r' % err)
 
-        if self.job_finder.conn_closed == False: self.job_finder.db_util.close_connection()
+        if self.finder.conn_closed == False:
+            self.finder.dbutil.close_connection()
 
     def load_configuration(self, config_file=DEFAULT_CONFIG_FILE):
         """

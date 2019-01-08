@@ -32,13 +32,13 @@ import sqlite3
 import logging
 
 # update for packaging, use . relative path identifiers
-from .dbutil import Dbutil
+from jobfinder import dbutil, job, emailer, recipient
 from .job import Job
 from .recipient import Recipient
 from .emailer import Emailer
 
 
-class Job_Finder(object):
+class Finder(object):
 
     def __init__(self, args=None):
         """Constructor"""
@@ -47,7 +47,7 @@ class Job_Finder(object):
 
         self.logger.info('Initializing Job Finder')
 
-        self.dbutil = Dbutil()
+        self.dbutil = dbutil.Dbutil()
 
         self.conn_closed = False
 

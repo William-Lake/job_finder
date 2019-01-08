@@ -19,7 +19,8 @@ import logging
 import smtplib
 from email.mime.text import MIMEText
 
-import jobfinder.dbutil.Dbutil.get_props as get_props
+from jobfinder import dbutil
+from .dbutil import Dbutil
 
 
 class Emailer(object):
@@ -27,7 +28,7 @@ class Emailer(object):
     def __init__(self):
         """Constructor"""
 
-        props = get_props()
+        props = dbutil.Dbutil.get_props()
 
         self.logger = logging.getLogger()
         self.logger.info('Initializing Job Emailer')

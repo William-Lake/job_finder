@@ -25,7 +25,7 @@ import sys
 import time
 
 from os.path import expanduser
-from .dbconnect import Dbconnection
+from jobfinder import dbconnect, job, recipient
 from .job import Job
 from .recipient import Recipient
 
@@ -40,7 +40,7 @@ class Dbutil(object):
 
         self.logger = logging.getLogger()
 
-        self.conn = Dbconnection()
+        self.conn = dbconnect.Dbconnection()
 
     def gather_current_recipients(self):
         """Gathers all the currently saved recipients in the database."""
