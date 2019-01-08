@@ -46,6 +46,7 @@ If you're on a Windows system, I recommend [this guide](https://github.com/Burnt
     # Dont forget the "." after -e
 
     cd job_finder
+    pip install -r requirements.txt
     pip install -e .
     ```
 
