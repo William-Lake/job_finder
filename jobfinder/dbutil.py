@@ -23,16 +23,14 @@ import shutil
 import sqlite3
 import sys
 import time
-from os.path import expanduser
 
-from .dbconnect import Db_Connection
+from os.path import expanduser
+from .dbconnect import Dbconnection
 from .job import Job
 from .recipient import Recipient
 
 # This variable should comde from __init__.py but it's not working yet.
 DATABASE = 'jobfinder.db'
-
-
 
 
 class Dbutil(object):
@@ -42,7 +40,7 @@ class Dbutil(object):
 
         self.logger = logging.getLogger()
 
-        self.db_connection = Db_Connection()
+        self.conn = Dbconnection()
 
     def gather_current_recipients(self):
         """Gathers all the currently saved recipients in the database."""
@@ -51,8 +49,7 @@ class Dbutil(object):
 
         recipients = []
 
-        recipients_data = self.db_connection.execute_select(
-            'SELECT * FROM recipient')
+        recipients_data = self.conn.execute_select('SELECT * FROM recipient')
 
         for recipient_data in recipients_data:
             recipient_id = recipient_data[0]
@@ -76,7 +73,7 @@ class Dbutil(object):
 
         statement = 'SELECT * FROM job WHERE date_closed IS NULL'
 
-        jobs_data = self.db_connection.execute_select(statement)
+        jobs_data = self.conn.execute_select(statement)
 
         if jobs_data is not None:
 
@@ -112,13 +109,13 @@ class Dbutil(object):
         self.saved_jobs = jobs_to_save
 
         for job in jobs_to_save:
-            statement = 'INSERT INTO job (id, site_id, contest_num, title,dept,site_url,date_opened) VALUES (?,?,?,?,?,?,?)'
+            statement = 'INSERT INTO job (id, site_id, contest_num, title, ' \
+                        'dept, site_url, date_opened) VALUES (?,?,?,?,?,?,?)'
 
-            params = (
-            job.job_id, job.site_id, job.contest_num, job.title, job.dept,
-            job.site_url, time.time())
+            params = (job.job_id, job.site_id, job.contest_num, job.title,
+                      job.dept, job.site_url, time.time())
 
-            self.db_connection.execute_insert(statement, params)
+            self.conn.execute_insert(statement, params)
 
     def delete_jobs(self, jobs_to_delete):
         """'Deletes' the given jobs from the database.
@@ -138,7 +135,7 @@ class Dbutil(object):
 
             params = (time.time(), job.job_id)
 
-            self.db_connection.execute_update(statement, params)
+            self.conn.execute_update(statement, params)
 
     def add_recipient(self, email):
         """Adds the given recipient to the database.
@@ -152,7 +149,7 @@ class Dbutil(object):
 
         params = (email, time.time())
 
-        self.db_connection.execute_insert(statement, params)
+        self.conn.execute_insert(statement, params)
 
     def remove_recipient(self, email):
         """Removes the given recipient from the database.
@@ -166,12 +163,12 @@ class Dbutil(object):
 
         params = (email,)
 
-        self.db_connection.execute_delete(statement, params)
+        self.conn.execute_delete(statement, params)
 
     def close_connection(self):
         """Closes the connection to the database."""
 
-        self.db_connection.close()
+        self.conn.close()
 
     @staticmethod
     def get_user_home():
@@ -207,10 +204,10 @@ class Dbutil(object):
         """
         if os.path.isfile(Dbutil.get_db_path()):
             try:
-                get_db_version()
+                Dbutil.get_db_version()
                 return "Database Status = OK"
             except NameError as err:
-                raise
+                raise err
         else:
             Dbutil.init_db()
 
@@ -224,7 +221,7 @@ class Dbutil(object):
             3. Add script information to appdata table
         """
         # get location of the sqlite init script
-        SQL_FILE = os.path.join(
+        sql_file = os.path.join(
             os.path.dirname(
                 os.path.abspath(__file__)), 'resources/sqlite.sql')
 
@@ -234,7 +231,7 @@ class Dbutil(object):
         # Connect to SQLite3 database
         with sqlite3.connect(Dbutil.get_db_path()) as conn:
             cur = conn.cursor()
-            fd = open(SQL_FILE, 'r')
+            fd = open(sql_file, 'r')
             script = fd.read()
             cur.executescript(script)
             fd.close()
@@ -253,16 +250,16 @@ class Dbutil(object):
         Returns
             smtp[1], port[2], email[3] and pword[4]
         """
-        data = {}
         try:
-            conn = sqlite3.connect(get_db_path())
+            conn = sqlite3.connect(Dbutil.get_db_path())
             cur = conn.cursor()
             cur.execute('SELECT * FROM props WHERE ROWID = 1')
             data = cur.fetchone()
             conn.close()
             return data
         except sqlite3.OperationalError as sql3_error:
-            print("Failed fetchall on props => {sql3_error}".format(sql3_error=sql3_error))
+            print("Failed fetchall on props => {sql3_error}".format(
+                sql3_error=sql3_error))
             sys.exit(2)
 
     @staticmethod
@@ -277,22 +274,27 @@ class Dbutil(object):
         try:
             with sqlite3.connect(Dbutil.get_db_path()) as conn:
                 cur = conn.cursor()
-                cur.execute('SELECT * FROM appdata ORDER BY ROWID ASC LIMIT 1')
+                cur.execute('SELECT * FROM appdata '
+                            'ORDER BY ROWID ASC LIMIT 1')
                 for row in cur.fetchall():
                     dbv = row[3]
             conn.close()
             return dbv
         except sqlite3.OperationalError as sql3_error:
+            print("Fetchrow failed=> {sql3_error}".format(
+                sql3_error=sql3_error))
             Dbutil.init_db()
 
     @staticmethod
     def get_db_path():
         """Get AppData Directory based on Platform"""
         if sys.platform == 'win32':
-            DB_NAME = os.path.abspath(os.path.join(
-                Dbutil.get_user_home(), 'AppData', 'Local', 'jobfinder', DATABASE))
+            db_name = os.path.abspath(os.path.join(
+                Dbutil.get_user_home(), 'AppData', 'Local',
+                'jobfinder', DATABASE))
         else:
-            DB_NAME = os.path.abspath(os.path.join(
-                Dbutil.get_user_home(), '.local', 'share', 'jobfinder', DATABASE))
+            db_name = os.path.abspath(os.path.join(
+                Dbutil.get_user_home(), '.local', 'share',
+                'jobfinder', DATABASE))
 
-        return DB_NAME
+        return db_name
