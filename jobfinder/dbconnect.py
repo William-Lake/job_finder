@@ -20,8 +20,8 @@
 import logging
 import sqlite3
 
-import jobfinder.dbutil
-
+import jobfinder.dbutil.Dbutil.get_db_path as check_db
+import jobfinder.dbutil.Dbutil.get_db_path as get_db_path
 
 class Dbconnection(object):
 
@@ -29,9 +29,9 @@ class Dbconnection(object):
         """Constructor"""
    
         self.logger = logging.getLogger()
-        self.logger.info(jobfinder.dbutil.Dbutil.check_db())
+        self.logger.info(check_db())
         self.logger.info('Connecting To DB')
-        self.conn = sqlite3.connect(jobfinder.dbutil.Dbutil.get_db_path())
+        self.conn = sqlite3.connect(get_db_path())
 
     def execute_insert(self, statement, params=None):
         """Executes an INSERT on the database.
