@@ -117,6 +117,6 @@ class Dbconnection(object):
             do_commit {boolean} -- True if the database changes should be
             committed. (default: {False})
         """
-        self.logger.info('Closing db')
+        self.logger.info = 'Closing db'
         self.conn.commit()
         self.conn.close()

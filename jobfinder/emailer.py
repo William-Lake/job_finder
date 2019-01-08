@@ -15,6 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 """Emails recipients about new jobs."""
 
+import sys
 import logging
 import smtplib
 from email.mime.text import MIMEText
@@ -28,17 +29,25 @@ class Emailer(object):
     def __init__(self):
         """Constructor"""
 
-        props = dbutil.Dbutil.get_props()
+        # for debugging props is returning properly
+        self.debug = '0'
 
         self.logger = logging.getLogger()
         self.logger.info('Initializing Job Emailer')
-        self.smtp = props[1]
-        self.port = props[2]
-        self.email = props[3]
-        self.password = props[4]
-
+        self.props = dbutil.Dbutil.get_props()
+        self.smtp = self.props[1]
+        self.port = self.props[2]
+        self.email = self.props[3]
+        self.password = self.props[4]
+        
         # Assumed for now, no current plans to send emails with anything else.
         self.text_subtype = 'plain'
+        
+        # in debug mode, print props and exit
+        if self.debug == '1':
+            self.logger.info(self.props)
+            print(self.props)
+            sys.exit(0)
 
     def notify_recipients_of_job(self, recipients, job, is_new=True):
         """Notifies the given list of recipients of the given job.
