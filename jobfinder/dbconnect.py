@@ -12,28 +12,26 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""
-DB Connection
+""" Database COnnection
 
-Represents the connection to the database, 
-centralizing transactions and management.
+    Represents the connection to the database, centralizing transactions
+    and management.
 """
 import logging
 import sqlite3
 
-import jobfinder.job_finder_props
-import jobfinder.db_util
+import jobfinder.dbutil
 
 
-class Db_Connection(object):
+class Dbconnection(object):
 
     def __init__(self):
         """Constructor"""
-
+   
         self.logger = logging.getLogger()
-        self.logger.info(jobfinder.db_util.check_db())
+        self.logger.info(jobfinder.dbutil.Dbutil.check_db())
         self.logger.info('Connecting To DB')
-        self.conn = sqlite3.connect(jobfinder.db_util.get_db())
+        self.conn = sqlite3.connect(jobfinder.dbutil.Dbutil.get_db_path())
 
     def execute_insert(self, statement, params=None):
         """Executes an INSERT on the database.
@@ -42,7 +40,8 @@ class Db_Connection(object):
             statement {str} -- The SQL statement to execute.
         
         Keyword Arguments:
-            params {list} -- The parameters to use when executing the SQL statement. (default: {None})
+            params {list} -- The parameters to use when executing the SQL
+            statement. (default: {None})
         """
 
         self.execute_statement(statement, params)
@@ -54,13 +53,14 @@ class Db_Connection(object):
             statement {str} -- The SQL statement to execute.
         
         Keyword Arguments:
-            params {list} -- The parameters to use when executing the SQL statement. (default: {None})
+            params {list} -- The parameters to use when executing the
+            SQL statement. (default: {None})
         
         Returns:
             list -- The results of the given SQL SELECT statement.
         """
 
-        if params == None:
+        if params is None:
             results = self.conn.execute(statement)
 
         else:
@@ -75,7 +75,8 @@ class Db_Connection(object):
             statement {str} -- The SQL statement to execute.
         
         Keyword Arguments:
-            params {list} -- The parameters to use when executing the SQL statement. (default: {None})
+            params {list} -- The parameters to use when executing the SQL
+            statement. (default: {None})
         """
 
         self.execute_statement(statement, params)
@@ -87,7 +88,8 @@ class Db_Connection(object):
             statement {str} -- The SQL statement to execute.
         
         Keyword Arguments:
-            params {list} -- The parameters to use when executing the SQL statement. (default: {None})
+            params {list} -- The parameters to use when executing the SQL
+            statement. (default: {None})
         """
 
         self.execute_statement(statement, params)
@@ -99,12 +101,11 @@ class Db_Connection(object):
             statement {str} -- The SQL statement to execute.
         
         Keyword Arguments:
-            params {list} -- The parameters to use when executing the SQL statement.. (default: {None})
+            params {list} -- The parameters to use when executing the SQL
+            statement.. (default: {None})
         """
-
-        if params == None:
+        if params is None:
             self.conn.execute(statement)
-
         else:
             self.conn.execute(statement, params)
 
@@ -114,8 +115,9 @@ class Db_Connection(object):
         """Closes the database connection, commiting the changes if necessary.
         
         Keyword Arguments:
-            do_commit {boolean} -- True if the database changes should be committed. (default: {False})
+            do_commit {boolean} -- True if the database changes should be
+            committed. (default: {False})
         """
-        self.logger.info='Closing db'
+        self.logger.info('Closing db')
         self.conn.commit()
         self.conn.close()
