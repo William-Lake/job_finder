@@ -232,6 +232,8 @@ ECHO ----------------------------------------
 ECHO.
 ECHO  The build script takes one option^:
 ECHO.
+ECHO    make ^<option^>
+ECHO.
 ECHO    clean      :  clean the build tree
 ECHO    distclean  :  clean distribution files adn folders
 ECHO    dist       :  generate distribution wheel
@@ -239,10 +241,11 @@ ECHO    install    :  install the application locally
 ECHO    uninstall  :  uninstall the application
 ECHO    pubtest    :  publish app to test.pypi.org
 ECHO    publish    :  publish app to pypi.org
-ECHO    setup      :  pip install requirments.txt
-ECHO    setupdev   :  pip install requirments-dev.txt
+ECHO    setup      :  pip install requirements.txt
+ECHO    setupdev   :  pip install requirements-dev.txt
 ECHO.
 ECHO    Example:
+ECHO      make setup
 ECHO      make clean
 ECHO      make install
 ECHO.
