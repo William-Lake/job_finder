@@ -23,7 +23,7 @@ _all__ = (
 __title__ = "jobfinder"
 __summary__ = "Python app to gather State of Montana IT jobs in Helena, MT."
 __uri__ = "https://github.com/KI7MT/job_finder/"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 __author__ = "Greg Beam"
 __email__ = "ki7mt@yahoo.com"
