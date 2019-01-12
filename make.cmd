@@ -39,7 +39,7 @@
 
 :: Make File Variables
 SET app_name=jobfinder
-SET app_ver=0.1.3
+SET app_ver=0.1.4
 SET pypitest=--repository-url https://test.pypi.org/legacy/ dist/*
 SET test_install=-i https://test.pypi.org/simple/ jobfinder
 SET prod_install=-i https://pypi.org/simple/ jobfinder

@@ -3,7 +3,7 @@
 | Application Data ||
 | ---| --- |
 | Package            | [jobfinder][]
-| Version            | 0.1.3
+| Version            | 0.1.4
 | Topic              | Information Technology, Utilities
 | Development Status | 2 - Pre-Alpha
 | Compatibility      | Windows, Linux, MacOS

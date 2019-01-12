@@ -3,7 +3,7 @@
 # Prerequsists : GNU Make, Python, Setuptools, Twine
 
 PROGRAM	:= jobfinder
-VERSION	:= 0.1.3
+VERSION	:= 0.1.4
 AUTHOR	:= Greg Beam, KI7MT
 LICENSE	:= GPLv3
 BUGS	:= https://github.com/William-Lake/job_finder/issues
