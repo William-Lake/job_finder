@@ -29,7 +29,7 @@
 ## Contributors
 
 - Principal Author : [William Lake][]
-- [PyPi][] Packaging : [Greg beam][]
+- [PyPi][] Packaging : [Greg Beam][]
 
 ## Overview
 
@@ -40,9 +40,9 @@ job if one appears. Job data gathered from the State of Montana's
 
 ## Requirements
 
-[Job Finder][] was built using Python >= 3.5, 3.6, 3.7, on Ubuntu 18.04 and
-Windows 10 using [Anaconda Python](https://conda.io/docs/) virtual environments.
-For a full list of modules used, see [requirements.txt][]
+[Job Finder][] was built using Python >= 3.5, 3.6, 3.7; tested on Ubuntu 18.04
+and Windows 10 using [Anaconda Python](https://conda.io/docs/) virtual
+environments. For a full list of modules used, see [requirements.txt][]
 
 ## Installation
 
@@ -51,8 +51,9 @@ For a full list of modules used, see [requirements.txt][]
 > will be used rather than the `-e .` convention. Likewise, there will be no
 > need to clone the repository beforehand.
 
-A `Makefile` for both Windows and Linux | Posix systems. The help message look
-may be slightly different, but, the commands are identical for both systems.
+A `Makefile` exists for both Windows and Linux | Posix systems. The help message
+may look slightly different on each system, however, the commands are identical
+for both.
 
 ```bash
 ----------------------------------------
@@ -107,7 +108,7 @@ may be slightly different, but, the commands are identical for both systems.
 
 The entry point for the application is aptly called, `jobfinder`. The purpose of
 this script is to manage interaction with the parser, recipient, and
-smtpemail-sender.
+smtp-sender.
 
 ### Using the Driver script
 
@@ -122,14 +123,14 @@ The `jobfinder` script provides three main functions:
 To add a new recipient you would execute the `jobfinder` script, passing in the
 `ADD` keyword followed by the recipient's email address, like so:
 
-```shell
+```bash
 jobfinder ADD test@email.com
 ```
 
 You can also add a list of recipients, however **they need to be in a .txt file
 with one recipient per line.**
 
-```shell
+```bash
 jobfinder ADD recipients_to_add.txt
 ```
 
@@ -138,14 +139,16 @@ jobfinder ADD recipients_to_add.txt
 To remove a recipient you would execute the `jobfinder` script, passing in the
 `REMOVE` keyword followed by the recipient's email address, like so:
 
-```shell
+```bash
 jobfinder REMOVE test@email.com
 ```
 
-You can also remove a list of recipients, however **they need to be in a .txt
-file with one recipient per line.**
+You can also remove a list of recipients, however, they need to be in a `*.txt`
+file with *One Recipient per Line*.
 
-```shell
+```bash
+# Add recipients from file
+
 jobfinder ADD recipients_to_remove.txt
 ```
 
@@ -154,23 +157,25 @@ jobfinder ADD recipients_to_remove.txt
 To perform the default `Job_Finder` functions, you would execute the `jobfinder`
 script with no arguments:
 
-```shell
+```bash
+# Launch jobfinder to parse jobs, and email recipients
+
 jobfinder
 ```
 
 ### Notifying Recipients
 
-`Job_Finder` uses `Job_Emailer` to notify recipients of jobs that have either
+`jobfinder` uses `email` to notify recipients of jobs that have either
 closed or opened recently.
 
-In order to do so, `Job_Emailer` needs a useable email address and password,
+In order to do so, `email` needs a useable email address and password,
 as well as smtp and port info. This information is stored ina  database tabled
 named `jobfinder.db` for SQLite3, and in a Schema named `jobs` in
 the default `PostgreSQL` installation.
 
 Access to the SQLite3 Database can be found at the following locations:
 
-```shell
+```bash
 For Windows
 
 C:\Users\%username%\AppData\Local\jobfinder\jobfinder.db
@@ -181,7 +186,7 @@ $HOME/.local/share/jobfinder/jobfinder.db
 
 The data required for the `props` table (SQLite | PostgreSQL) is as follows:
 
-```shell
+```bash
 SMTP=test.server.net
 PORT=1234
 EMAIL=email@test.net
