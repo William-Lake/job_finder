@@ -124,13 +124,17 @@ To add a new recipient you would execute the `jobfinder` script, passing in the
 `ADD` keyword followed by the recipient's email address, like so:
 
 ```bash
+# Add a single recipient to the database
+
 jobfinder ADD test@email.com
 ```
 
-You can also add a list of recipients, however **they need to be in a .txt file
-with one recipient per line.**
+You can also add a list of recipients, however they need to be in a `*.txt` file
+with *One Recipient per Line*.
 
 ```bash
+# Add a list of recipients to the database using a file
+
 jobfinder ADD recipients_to_add.txt
 ```
 
@@ -140,6 +144,8 @@ To remove a recipient you would execute the `jobfinder` script, passing in the
 `REMOVE` keyword followed by the recipient's email address, like so:
 
 ```bash
+# Remove recipient form the database
+
 jobfinder REMOVE test@email.com
 ```
 
@@ -147,7 +153,7 @@ You can also remove a list of recipients, however, they need to be in a `*.txt`
 file with *One Recipient per Line*.
 
 ```bash
-# Add recipients from file
+# Remove a list of recipients from database using a file
 
 jobfinder ADD recipients_to_remove.txt
 ```
