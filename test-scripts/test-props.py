@@ -1,4 +1,4 @@
-""" Simple scritp to test SQLite3 props table"""
+""" Simple script to test SQLite3 props table"""
 
 import os
 from os.path import expanduser
@@ -15,7 +15,7 @@ def get_user_home():
 db = get_user_home() + "\AppData\Local\job_finder\jobfinder.db"
 
 # For Linux
-# db = get_user_home() + "/.local/share//job_finder/\jobfinder.db"
+# db = get_user_home() + "/.local/share/job_finder/jobfinder.db"
 
 # No edits required beyond this point.
 data = {}
