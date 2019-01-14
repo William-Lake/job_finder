@@ -30,16 +30,15 @@ import time
 import urllib
 import sqlite3
 import logging
+from datetime import datetime
 
 # update for packaging, use . relative path identifiers
-from jobfinder import dbutil, job, emailer, recipient
-from .job import Job
-from .recipient import Recipient
-from .emailer import Emailer
+from .models import *
+from .dbutil import Dbutil
 
 
 class Finder(object):
-
+    
     def __init__(self, args=None):
         """Constructor"""
 
@@ -47,7 +46,9 @@ class Finder(object):
 
         self.logger.info('Initializing Job Finder')
 
-        self.dbutil = dbutil.Dbutil()
+        self.dbutil = Dbutil()
+
+        self.emailer = Emailer()
 
         self.conn_closed = False
 
@@ -63,7 +64,7 @@ class Finder(object):
 
             self.logger.debug('No args passed.')
 
-            self.gather_and_review_jobs()
+            self.__gather_and_review_jobs()
 
         else:
 
@@ -73,71 +74,79 @@ class Finder(object):
 
             if self.args[0].upper().strip() == 'ADD':
 
-                if target.endswith('.txt'):
-                    self.add_recipients(target)
+                if target.endswith('.txt'): 
+                    
+                    self.__add_recipients(target)
 
                 else:
-                    self.dbutil.add_recipient(target)
+
+                    Recipient.create(Recipient.email = target)
 
             elif self.args[0].upper().strip() == 'REMOVE':
 
                 if target.endswith('.txt'):
-                    self.remove_recipients(target)
+
+                    self.__remove_recipients(target)
 
                 else:
-                    self.dbutil.remove_recipient(target)
+                    
+                    recipient = Recipient.get_or_none(Recipient.email = target)
 
-    def gather_and_review_jobs(self):
+                    if recipient is not None: Recipient.delete_instance()
+
+                    else: self.logger.warn(f'User with email ({email}) was not in the database.')
+
+    def __gather_and_review_jobs(self):
         """Gathers the jobs from the web,
         compares them to those in the database,
         and notifies the recipients if necessary.
         """
         self.logger.info('Gathering and Reviewing Jobs')
 
-        self.emailer = Emailer()
+        self.__review_jobs()
 
-        self.current_recipients = self.dbutil.gather_current_recipients()
+        self.__notify_recipients()
 
-        self.current_jobs = self.dbutil.gather_current_jobs()
-
-        self.review_jobs()
-
-        self.notify_recipients()
-
-    def add_recipients(self, file_name):
+    def __add_recipients(self, file_name):
 
         self.logger.info('Saving Recipients in ' + file_name)
 
         emails = open(file_name).readlines()
 
-        for email in emails: self.dbutil.add_recipient(email.strip())
+        for email in emails: Recipient.create(Recipient.email = email, Recipient.date_added = datetime.today().strftime('%Y-%m-%d'))
 
-    def remove_recipients(self, file_name):
+    def __remove_recipients(self, file_name):
 
         self.logger.debug('Removing Recipients in ' + file_name)
 
         emails = open(file_name).readlines()
 
-        for email in emails: self.dbutil.remove_recipient(email.strip())
+        for email in emails: 
 
-    def review_jobs(self):
+            recipient = Recipient.get_or_none(Recipient.email == email)
+
+            if recipient is not None: Recipient.delete_instance()
+
+            else: self.logger.warn(f'User with email ({email}) was not in the database.')
+
+    def __review_jobs(self):
         """Gathers all the jobs from the State of MT jobs site,
         saving those that are new,
         and deleting those that have closed.
         """
         self.logger.info('Reviewing Jobs')
 
-        self.gather_jobs_on_site()
+        jobs_on_site = self.__gather_jobs_on_site()
 
-        self.save_jobs()
+        self.__save_jobs(jobs_on_site)
 
-        self.delete_jobs()
+        self.__close_jobs(jobs_on_site)
 
-    def gather_jobs_on_site(self):
+    def __gather_jobs_on_site(self):
         """Grabs the jobs from the State of MT website.
         """
 
-        self.logger.info = 'Gathering Jobs From Site'
+        self.logger.info('Gathering Jobs From Site')
 
         self.jobs_on_site = []
 
@@ -182,8 +191,7 @@ class Finder(object):
 
         cookie_dict = session.cookies.get_dict()
 
-        headers['Cookie'] = 'locale={}; JSESSIONID={}'.format(
-            cookie_dict['locale'], cookie_dict['JSESSIONID'])
+        headers['Cookie'] = f'locale={cookie_dict['locale']}; JSESSIONID={cookie_dict['JSESSIONID']}
 
         response = session.post(url, headers=headers, json=payload)
 
@@ -203,8 +211,7 @@ class Finder(object):
                 contest_num = job_data['contestNo']
 
                 # The job's full webpage (I.e. contains all the detailed job info.)
-                site_url = 'https://mtstatejobs.taleo.net/careersection/200/jobdetail.ftl?job={}'.format(
-                    contest_num)
+                site_url = f'https://mtstatejobs.taleo.net/careersection/200/jobdetail.ftl?job={contest_num}'
 
                 # Contains the primary job details such as...
                 target_data = job_data['column']
@@ -222,8 +229,13 @@ class Finder(object):
                 job_id = hash(site_id + contest_num + site_url + title + dept)
 
                 # Create a job object with the collected data.
-                new_job = Job(job_id, site_id, contest_num, title, dept,
-                              site_url)
+                new_job = Job(
+                    Job.id = job_id, 
+                    Job.site_id = site_id, 
+                    Job.contest_num = contest_num, 
+                    Job.title = title, 
+                    Job.dept = dept,
+                    Job.site_url = site_url)
 
                 self.jobs_on_site.append(new_job)
 
@@ -232,71 +244,63 @@ class Finder(object):
             self.logger.error(
                 'Taleo response code != 200: ' + str(response.status_code))
 
-        # TODO: Email yourself/Bryon
+        return jobs_on_site
 
-    def save_jobs(self):
+    def __save_jobs(self, jobs_on_site):
         """From the list of jobs that have been pulled from the web, finds those
         that need to be saved.
         """
-        self.logger.info='Finding Jobs to Save'
-        self.jobs_to_save = []
-        current_job_ids = self.gather_job_ids(self.current_jobs)
+        self.logger.info('Finding Jobs to Save')
 
-        for job in self.jobs_on_site:
-            job_id = job.job_id
-            if job_id not in current_job_ids:
-                self.jobs_to_save.append(job)
+        self.saved_jobs = []
 
-        self.logger.debug(
-            'Found {} Jobs To Save'.format(len(self.jobs_to_save)))
+        # Create a list of the job ids for open jobs in the database.
+        current_job_ids = [job.id for job in Job.select().where(Job.date_closed == None)]
 
-        if len(self.jobs_to_save) > 0: self.dbutil.save_jobs(self.jobs_to_save)
+        for job in jobs_on_site:
 
-    def delete_jobs(self):
+            if job.id not in current_job_ids: 
+
+                job.save()
+
+                self.saved_jobs.append(job)
+
+        self.logger.debug(f'Saved {len(self.saved_jobs)}.')
+
+    def __close_jobs(self, jobs_on_site):
         """From the list of jobs that have been pulled from the web,
-        finds those that need to be deleted.
+        finds those that need to be closed.
         """
-        self.logger.info = 'Finding Jobs to delete'
-        self.jobs_to_delete = []
+        self.logger.info('Finding Jobs to close')
 
-        site_job_ids = self.gather_job_ids(self.jobs_on_site)
+        self.closed_jobs = []
 
-        for job in self.current_jobs:
-            if job.job_id not in site_job_ids:
-                self.jobs_to_delete.append(job)
+        # Create a list of the job ids for open jobs in the database.
+        site_job_ids = [job.id for job in jobs_on_site]
 
-        self.logger.debug(
-            'Found {} Jobs to Delete'.format(len(self.jobs_to_delete)))
+        for job in Job.select().where(Job.date_closed == None):
 
-        if len(self.jobs_to_delete) > 0:
-            self.dbutil.delete_jobs(self.jobs_to_delete)
+            if job.id not in site_job_ids:
 
-    def gather_job_ids(self, jobs):
-        """Creates a list of job ids from a given list of jobs.
+                job.date_closed = datetime.today().strftime('%Y-%m-%d')
 
-        Arguments:
-            jobs {list} -- The jobs to gather the ids from.
+                job.save()
+                
+                self.closed_jobs.append(job)
 
-        Returns:
-            list -- The job ids pulled from the provided jobs.
-        """
+        self.logger.debug(f'Closed {len(self.closed_jobs)} jobs.')
 
-        job_ids = []
-
-        for job in jobs:
-            job_ids.append(job.job_id)
-
-        return job_ids
-
-    def notify_recipients(self):
+    def __notify_recipients(self):
         """Notifies all recipients in the database about a job closing or opening."""
 
-        if len(self.jobs_to_save) > 0 or len(self.jobs_to_delete) > 0:
+        if len(self.saved_jobs) > 0 or len(self.closed_jobs) > 0:
 
             self.logger.info='Notifying Recipients'
 
-            for job in self.dbutil.saved_jobs: self.emailer.notify_recipients_of_job(
-                self.current_recipients, job)
+            for job in self.saved_jobs: 
+                
+                self.emailer.notify_recipients_of_job(job, Emailer.OPENED)
 
-            for job in self.dbutil.deleted_jobs: self.emailer.notify_recipients_of_job(
-                self.current_recipients, job, False)
+            for job in self.dbutil.closed_jobs: 
+                
+                self.emailer.notify_recipients_of_job(job, Emailer.CLOSED)

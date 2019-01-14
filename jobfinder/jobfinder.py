@@ -99,9 +99,9 @@ class Driver(object):
 
             args.append(sys.argv[2])
 
-            self.logger.debug('Arg 1: {}'.format(args[0]))
+            self.logger.debug(f'Arg 1: {args[0]}')
 
-            self.logger.debug('Arg 2: {}'.format(args[1]))
+            self.logger.debug(f'Arg 2: {args[1]}')
 
         except:
 

@@ -22,9 +22,14 @@ from email.mime.text import MIMEText
 
 from jobfinder import dbutil
 from .dbutil import Dbutil
+from .models import Recipient
 
 
 class Emailer(object):
+
+    OPENED = 'NEW JOB\n'
+
+    CLOSED = 'JOB CLOSED\n'
 
     def __init__(self):
         """Constructor"""
@@ -33,11 +38,17 @@ class Emailer(object):
         self.debug = '0'
 
         self.logger = logging.getLogger()
+
         self.logger.info('Initializing Job Emailer')
+
         self.props = dbutil.Dbutil.get_props()
+
         self.smtp = self.props[1]
+
         self.port = self.props[2]
+
         self.email = self.props[3]
+
         self.password = self.props[4]
         
         # Assumed for now, no current plans to send emails with anything else.
@@ -45,73 +56,71 @@ class Emailer(object):
         
         # in debug mode, print props and exit
         if self.debug == '1':
+
             self.logger.info(self.props)
+
             print(self.props)
+
             sys.exit(0)
 
-    def notify_recipients_of_job(self, recipients, job, is_new=True):
-        """Notifies the given list of recipients of the given job.
+    def notify_recipients_of_job(self,job,status):
+        """Notifies the recipients of a change in job status.
         
         Arguments:
-            recipients {list} -- The list of recipients to notify.
             job {job} -- The job to notify the recipients of.
-            is_new {boolean} -- True if this is a new job, False if it's a job being closed.
+            status {str} -- The job status to notify the recipients. Only two values acceptable, both as constants: Emailer.OPENED Emailer.CLOSED
         """
 
-        self.is_new = is_new
+        if (
+            status != Emailer.OPENED and
+            status != Emailer.CLOSED
+        ):
+            raise Exception('Job status can only be Emailer.OPENED or Emailer.CLOSED.')
 
-        self.job = job
+        email_body = self.__create_email_body(job,status)
 
-        self.recipients = recipients
+        for recipient in Recipient.select():
 
-        self.create_email_body()
+            self.__craft_message(job, email_body, recipient.email, status)
 
-        self.gather_recipient_emails()
+            self.__send_email(recipient.email)
 
-        for email in self.recipient_emails:
-            self.craft_message(email)
-
-            self.send_email(email)
-
-    def create_email_body(self):
+    def __create_email_body(self, job, job_status):
         """Creates the email body using the data from the job object."""
 
-        if self.is_new:
-            self.msg_data = 'NEW JOB\n'
+        email_body = job_status
 
-        else:
-            self.msg_data = 'JOB CLOSED\n'
+        email_body += f'Title: {job.title}\n'
 
-        self.msg_data += 'Title: {}\n'.format(self.job.title)
+        email_body += f'Dept.: {job.dept}\n'
 
-        self.msg_data += 'Dept.: {}\n'.format(self.job.dept)
+        email_body += f'Full Posting: {job.site_url}\n'
 
-        self.msg_data += 'Full Posting: {}\n'.format(self.job.site_url)
+        return email_body
 
-    def gather_recipient_emails(self):
-        """Gathers the recipients' emails into a comma delimited string."""
+    def __craft_message(self, job, email_body, recipient_email, status):
+        """Creates an email message.
+        
+        Arguments:
+            email_body {str} -- The body of the email.
+            recipient_email {str} -- The email of the recipient.
+            status {str} -- The status of the job the email is being created for. Either one of two options, Emailer.OPENED or Emailer.CLOSED.
+        """
 
-        self.recipient_emails = []
+        self.msg = MIMEText(email_body, self.text_subtype)
 
-        for recipient in self.recipients:
-            self.recipient_emails.append(recipient.email)
-
-    def craft_message(self, email):
-        """Crafts a locally-sourced, artisinal email message."""
-
-        self.msg = MIMEText(self.msg_data, self.text_subtype)
-
-        if self.is_new:
-            self.msg['Subject'] = 'New Job Posted: {}'.format(self.job.title)
-
-        else:
-            self.msg['Subject'] = 'Job Closed: {}'.format(self.job.title)
+        self.msg['Subject'] = (
+            f'New Job Posted: {job.title}'
+            if status == Emailer.OPENED
+            else
+            f'Job Closed: {job.title}'
+        )
 
         self.msg['From'] = self.email
 
-        self.msg['To'] = email
+        self.msg['To'] = recipient_email
 
-    def send_email(self, email):
+    def __send_email(self, email):
         """Sends the created email."""
 
         try:
@@ -120,7 +129,7 @@ class Emailer(object):
 
             smtpObj.login(user=self.email, password=self.password, )
 
-            self.logger.debug('Sending to ' + email)
+            self.logger.debug(f'Sending to {email}')
 
             smtpObj.sendmail(self.email, email, self.msg.as_string())
 
