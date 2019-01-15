@@ -33,8 +33,9 @@ import logging
 from datetime import datetime
 
 # update for packaging, use . relative path identifiers
-from .models import *
-from .dbutil import Dbutil
+from models import *
+from dbutil import Dbutil
+from emailer import Emailer
 
 
 class Finder(object):
@@ -80,7 +81,7 @@ class Finder(object):
 
                 else:
 
-                    Recipient.create(Recipient.email = target)
+                    Recipient.create(email = target)
 
             elif self.args[0].upper().strip() == 'REMOVE':
 
@@ -90,7 +91,7 @@ class Finder(object):
 
                 else:
                     
-                    recipient = Recipient.get_or_none(Recipient.email = target)
+                    recipient = Recipient.get_or_none(Recipient.email == target)
 
                     if recipient is not None: Recipient.delete_instance()
 
@@ -113,7 +114,10 @@ class Finder(object):
 
         emails = open(file_name).readlines()
 
-        for email in emails: Recipient.create(Recipient.email = email, Recipient.date_added = datetime.today().strftime('%Y-%m-%d'))
+        for email in emails: 
+            Recipient.create(
+                email = email, 
+                date_added = datetime.today().strftime('%Y-%m-%d'))
 
     def __remove_recipients(self, file_name):
 
@@ -191,7 +195,7 @@ class Finder(object):
 
         cookie_dict = session.cookies.get_dict()
 
-        headers['Cookie'] = f'locale={cookie_dict['locale']}; JSESSIONID={cookie_dict['JSESSIONID']}
+        headers['Cookie'] = f'locale={cookie_dict["locale"]}; JSESSIONID={cookie_dict["JSESSIONID"]}'
 
         response = session.post(url, headers=headers, json=payload)
 
@@ -230,12 +234,12 @@ class Finder(object):
 
                 # Create a job object with the collected data.
                 new_job = Job(
-                    Job.id = job_id, 
-                    Job.site_id = site_id, 
-                    Job.contest_num = contest_num, 
-                    Job.title = title, 
-                    Job.dept = dept,
-                    Job.site_url = site_url)
+                    id = job_id, 
+                    site_id = site_id, 
+                    contest_num = contest_num, 
+                    title = title, 
+                    dept = dept,
+                    site_url = site_url)
 
                 self.jobs_on_site.append(new_job)
 
@@ -301,6 +305,6 @@ class Finder(object):
                 
                 self.emailer.notify_recipients_of_job(job, Emailer.OPENED)
 
-            for job in self.dbutil.closed_jobs: 
+            for job in self.closed_jobs: 
                 
                 self.emailer.notify_recipients_of_job(job, Emailer.CLOSED)

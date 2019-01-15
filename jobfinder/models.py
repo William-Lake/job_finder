@@ -1,6 +1,6 @@
 from peewee import *
 
-database = SqliteDatabase('jobfinder/resources/jobfinder.db', **{})
+database = SqliteDatabase(None)
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass

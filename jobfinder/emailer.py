@@ -20,9 +20,8 @@ import logging
 import smtplib
 from email.mime.text import MIMEText
 
-from jobfinder import dbutil
-from .dbutil import Dbutil
-from .models import Recipient
+from dbutil import Dbutil
+from models import Recipient
 
 
 class Emailer(object):
@@ -41,18 +40,26 @@ class Emailer(object):
 
         self.logger.info('Initializing Job Emailer')
 
-        self.props = dbutil.Dbutil.get_props()
+        self.props = Dbutil.get_props()
 
-        self.smtp = self.props[1]
+        if self.props is not None:
 
-        self.port = self.props[2]
+            self.smtp = self.props[1]
 
-        self.email = self.props[3]
+            self.port = self.props[2]
 
-        self.password = self.props[4]
-        
-        # Assumed for now, no current plans to send emails with anything else.
-        self.text_subtype = 'plain'
+            self.email = self.props[3]
+
+            self.password = self.props[4]
+            
+            # Assumed for now, no current plans to send emails with anything else.
+            self.text_subtype = 'plain'
+
+        else:
+
+            self.logger.error('DB Properties returns None')
+
+            sys.exit(1)
         
         # in debug mode, print props and exit
         if self.debug == '1':

@@ -20,11 +20,12 @@ import os
 import logging
 
 from logging.config import fileConfig
-from jobfinder import finder
-from jobfinder import dbutil
+from finder import Finder
+from dbutil import Dbutil
 
 
-class Driver(object):
+class JobFinder(object):
+    
     DEFAULT_CONFIG_FILE = os.path.join(
         os.path.dirname(
             os.path.abspath(__file__)), 'logging.conf')
@@ -32,13 +33,13 @@ class Driver(object):
     def __init__(self):
 
         # Always check the DB first before any actions to help prevent errors
-        self.checkdb = dbutil.Dbutil.check_db()
+        db_exists = Dbutil.check_db()
 
         self.load_configuration()
 
         self.logger = logging.getLogger()
 
-        self.finder = finder.Finder(self.gather_arguments())
+        self.finder = Finder(self.gather_arguments())
 
         try:
 
@@ -64,7 +65,10 @@ class Driver(object):
             the configuration file (default=/etc/package/logging.conf)
         :type config_file: str
         """
-        if not os.path.exists(config_file) or not os.path.isfile(config_file):
+        if (
+            not os.path.exists(config_file) or 
+            not os.path.isfile(config_file)):
+
             msg = '%s configuration file does not exist!', config_file
 
             logging.getLogger().error(msg)
@@ -113,8 +117,5 @@ class Driver(object):
 
 
 def main():
-    driver = Driver()
 
-
-if __name__ == '__main__':
-    main()
+    job_finder = JobFinder()

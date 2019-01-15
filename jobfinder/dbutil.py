@@ -64,14 +64,26 @@ class Dbutil(object):
             Tuple from the first row in DB
 
         """
-        if os.path.isfile(Dbutil.get_db_path()):
-            try:
-                Dbutil.get_db_version()
-                return "Database Status = OK"
-            except NameError as err:
-                raise err
-        else:
-            Dbutil.init_db()
+
+        '''
+        1. What database is going to be used?
+            - sqlite
+            - postgres
+        2. Does the database exist?
+        3. Can you connect to it?
+        '''
+
+        db_exists = True
+
+        try:
+
+            Props.select()
+
+        except:
+            
+            db_exists = False
+
+        return db_exists
 
     @staticmethod
     def init_db():
@@ -122,9 +134,10 @@ class Dbutil(object):
         except sqlite3.OperationalError as sql3_error:
             print(f"Failed fetchall on props => {sql3_error}")
             sys.exit(2)
+            return None
 
     @staticmethod
-    def get_db_version():
+    def get_db_version(db_path):
         """Get Job FinderDatabase Version
 
         Retruns
@@ -133,7 +146,7 @@ class Dbutil(object):
         """
         dbv = ""
         try:
-            with sqlite3.connect(Dbutil.get_db_path()) as conn:
+            with sqlite3.connect(db_path) as conn:
                 cur = conn.cursor()
                 cur.execute('SELECT * FROM appdata '
                             'ORDER BY ROWID ASC LIMIT 1')
