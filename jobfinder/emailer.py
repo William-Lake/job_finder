@@ -36,9 +36,9 @@ class Emailer(object):
         # for debugging props is returning properly
         self.debug = '0'
 
-        self.logger = logging.getLogger()
+        self.__logger = logging.getLogger()
 
-        self.logger.info('Initializing Job Emailer')
+        self.__logger.info('Initializing Job Emailer')
 
         self.props = Dbutil.get_props()
 
@@ -57,14 +57,14 @@ class Emailer(object):
 
         else:
 
-            self.logger.error('DB Properties returns None')
+            self.__logger.error('DB Properties returns None')
 
             sys.exit(1)
         
         # in debug mode, print props and exit
         if self.debug == '1':
 
-            self.logger.info(self.props)
+            self.__logger.info(self.props)
 
             print(self.props)
 
@@ -136,7 +136,7 @@ class Emailer(object):
 
             smtpObj.login(user=self.email, password=self.password, )
 
-            self.logger.debug(f'Sending to {email}')
+            self.__logger.debug(f'Sending to {email}')
 
             smtpObj.sendmail(self.email, email, self.msg.as_string())
 
@@ -144,4 +144,4 @@ class Emailer(object):
 
         except smtplib.SMTPException as err:
 
-            self.logger.exception('ERROR Unable to send email : %r' % err)
+            self.__logger.exception('ERROR Unable to send email : %r' % err)

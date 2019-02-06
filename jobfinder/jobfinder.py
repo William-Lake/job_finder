@@ -23,9 +23,9 @@ from logging.config import fileConfig
 from finder import Finder
 from dbutil import Dbutil
 
-
 class JobFinder(object):
-    
+    '''Manages the process of gathering jobs from the state of montana job site.'''
+
     DEFAULT_CONFIG_FILE = os.path.join(
         os.path.dirname(
             os.path.abspath(__file__)), 'logging.conf')
@@ -33,27 +33,24 @@ class JobFinder(object):
     def __init__(self):
 
         # Always check the DB first before any actions to help prevent errors
-        db_exists = Dbutil.check_db()
+        Dbutil.check_db()
 
-        self.load_configuration()
+        self.__load_configuration()
 
-        self.logger = logging.getLogger()
+        self.__logger = logging.getLogger()
 
-        self.finder = Finder(self.gather_arguments())
+        self.__finder = Finder(self.gather_arguments()) # TODO Replace with args gathered via Argparse and passed in.
 
         try:
 
-            self.finder.start()
+            self.__finder.start()
 
         except Exception as err:
 
-            self.logger.exception(
+            self.__logger.exception(
                 'There was an error during finder execution: %r' % err)
 
-        if self.finder.conn_closed == False:
-            self.finder.dbutil.close_connection()
-
-    def load_configuration(self, config_file=DEFAULT_CONFIG_FILE):
+    def __load_configuration(self, config_file=DEFAULT_CONFIG_FILE):
         """
         Loads logging configuration from the given configuration file.
 
@@ -93,7 +90,9 @@ class JobFinder(object):
     def gather_arguments(self):
         """Gathers the command line arguments if they exist."""
 
-        self.logger.info('Gathering Command Line Arguments')
+        # TODO Replace this with arguments gathered in main() via argparse.
+
+        self.__logger.info('Gathering Command Line Arguments')
 
         args = []
 
@@ -103,19 +102,21 @@ class JobFinder(object):
 
             args.append(sys.argv[2])
 
-            self.logger.debug(f'Arg 1: {args[0]}')
+            self.__logger.debug(f'Arg 1: {args[0]}')
 
-            self.logger.debug(f'Arg 2: {args[1]}')
+            self.__logger.debug(f'Arg 2: {args[1]}')
 
         except:
 
             args = None
 
-            self.logger.debug('Less than 2 arguments provided.')
+            self.__logger.debug('Less than 2 arguments provided.')
 
         return args
 
 
 def main():
+
+    # TODO Gather args via Argparse, pass into JobFinder
 
     job_finder = JobFinder()

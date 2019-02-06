@@ -9,6 +9,14 @@ EMAIL='xx'
 
 PASSWORD='xx'
 
-DB_NAME='Helena_Jobs.db'
+DB_NAME='jobs'
+
+DB_USER='jobs_admin'
+
+DB_PASS='jobs_admin'
+
+DB_HOST='127.0.0.1'
+
+DB_PORT=5432
 
 ERR_EMAIL_RECIP='lake.william.jk@gmail.com'

@@ -25,7 +25,7 @@ import sys
 import time
 
 from os.path import expanduser
-from models import *
+from models import database
 
 # This variable should comde from __init__.py but it's not working yet.
 DATABASE = 'jobfinder.db'
@@ -36,7 +36,7 @@ class Dbutil(object):
     def __init__(self):
         """Constructor"""
 
-        self.logger = logging.getLogger()
+        self.__logger = logging.getLogger()
 
     @staticmethod
     def make_dirs():
@@ -54,68 +54,35 @@ class Dbutil(object):
 
     @staticmethod
     def check_db():
-        """Check Database Connection
+        """Check Database Connection"""
 
-        Actions Performed:
-            1. Connect to database
-            2. If the database does not exist, create it with init_db()
+        if database.is_closed():
 
-        Returns
-            Tuple from the first row in DB
+            # TODO Replace with code to create the PostGres DB
 
-        """
+            # # get location of the sqlite init script
+            # sql_file = os.path.join(
+            #     os.path.dirname(
+            #         os.path.abspath(__file__)), 'resources/sqlite.sql')
 
-        '''
-        1. What database is going to be used?
-            - sqlite
-            - postgres
-        2. Does the database exist?
-        3. Can you connect to it?
-        '''
+            # # make the directories first
+            # Dbutil.make_dirs()
 
-        db_exists = True
+            # # Connect to SQLite3 database
+            # with sqlite3.connect(Dbutil.get_db_path()) as conn:
+            #     cur = conn.cursor()
+            #     fd = open(sql_file, 'r')
+            #     script = fd.read()
+            #     cur.executescript(script)
+            #     fd.close()
 
-        try:
-
-            Props.select()
-
-        except:
-            
-            db_exists = False
-
-        return db_exists
-
-    @staticmethod
-    def init_db():
-        """Create Job Finder Database
-
-        Actions Performed:
-            1. Open SQLit3 Database connection
-            2. Execute SQL query to create tables
-            3. Add script information to appdata table
-        """
-        # get location of the sqlite init script
-        sql_file = os.path.join(
-            os.path.dirname(
-                os.path.abspath(__file__)), 'resources/sqlite.sql')
-
-        # make the directories first
-        Dbutil.make_dirs()
-
-        # Connect to SQLite3 database
-        with sqlite3.connect(Dbutil.get_db_path()) as conn:
-            cur = conn.cursor()
-            fd = open(sql_file, 'r')
-            script = fd.read()
-            cur.executescript(script)
-            fd.close()
-
-            # get SQLite Version
-            cur.execute('SELECT SQLITE_VERSION()')
-            sv = cur.fetchone()
-            print(f"SQLite Version => {sv}")
-        # close connection
-        conn.close()
+            #     # get SQLite Version
+            #     cur.execute('SELECT SQLITE_VERSION()')
+            #     sv = cur.fetchone()
+            #     print(f"SQLite Version => {sv}")
+            # # close connection
+            # conn.close()
+            pass
 
     @staticmethod
     def get_props():

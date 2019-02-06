@@ -1,6 +1,18 @@
 from peewee import *
+from job_finder_props import DB_NAME
+from job_finder_props import DB_USER
+from job_finder_props import DB_PASS
+from job_finder_props import DB_HOST
+from job_finder_props import DB_PORT
 
-database = SqliteDatabase(None)
+# http://docs.peewee-orm.com/en/latest/peewee/database.html#using-postgresql
+database = PostgresqlDatabase(
+    DB_NAME, 
+    user=DB_USER, 
+    password=DB_PASS,
+    host=DB_HOST,
+    port=DB_PORT
+)
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass
