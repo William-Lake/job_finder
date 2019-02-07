@@ -54,6 +54,7 @@
 -- Create New Schema
 -- CREATE SCHEMA jobs;
 
+DROP TABLE IF EXISTS database_info;
 DROP TABLE IF EXISTS recipient;
 DROP TABLE IF EXISTS job;
 DROP TABLE IF EXISTS prop;
@@ -126,3 +127,17 @@ CREATE TABLE prop
 );
 
 -- END table creation
+
+CREATE USER jobs_admin WITH ENCRYPTED PASSWORD 'jobs_admin';
+
+GRANT ALL PRIVILEGES ON DATABASE jobs TO jobs_admin;
+
+GRANT ALL PRIVILEGES ON TABLE database_info TO jobs_admin;
+
+GRANT ALL PRIVILEGES ON TABLE recipient TO jobs_admin;
+
+GRANT ALL PRIVILEGES ON TABLE job TO jobs_admin;
+
+GRANT ALL PRIVILEGES ON TABLE prop TO jobs_admin;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA PUBLIC TO jobs_admin;

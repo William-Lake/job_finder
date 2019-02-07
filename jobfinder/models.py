@@ -1,18 +1,6 @@
 from peewee import *
-from job_finder_props import DB_NAME
-from job_finder_props import DB_USER
-from job_finder_props import DB_PASS
-from job_finder_props import DB_HOST
-from job_finder_props import DB_PORT
 
-# http://docs.peewee-orm.com/en/latest/peewee/database.html#using-postgresql
-database = PostgresqlDatabase(
-    DB_NAME, 
-    user=DB_USER, 
-    password=DB_PASS,
-    host=DB_HOST,
-    port=DB_PORT
-)
+database = PostgresqlDatabase('jobs', **{'host': '127.0.0.1', 'user': 'jobs_admin', 'password': 'jobs_admin'})
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass
@@ -21,44 +9,38 @@ class BaseModel(Model):
     class Meta:
         database = database
 
-class Appdata(BaseModel):
-    author = TextField(null=True)
-    copyright = TextField(null=True)
-    email = TextField(null=True)
-    license = TextField(null=True)
-    status = TextField(null=True)
-    version = TextField(null=True)
+class DatabaseInfo(BaseModel):
+    author = CharField(null=True)
+    db_version = CharField(null=True)
+    last_update = DateField(null=True)
 
     class Meta:
-        table_name = 'appdata'
-        primary_key = False
+        table_name = 'database_info'
 
 class Job(BaseModel):
-    contest_num = IntegerField(null=True)
-    date_closed = IntegerField(null=True)
-    date_opened = IntegerField(null=True)
-    dept = TextField(null=True)
-    id = IntegerField(null=True)
-    site_id = IntegerField(null=True)
-    site_url = TextField(null=True)
-    title = TextField(null=True)
+    content_num = IntegerField()
+    date_closed = DateField(null=True)
+    date_opened = DateField()
+    dept = TextField()
+    site_id = IntegerField()
+    site_url = TextField()
+    title = TextField()
 
     class Meta:
         table_name = 'job'
-        primary_key = False
 
-class Props(BaseModel):
-    email = CharField()
+class Prop(BaseModel):
+    is_selected = BooleanField(constraints=[SQL("DEFAULT false")])
     port = IntegerField()
     pword = CharField()
     smtp = CharField()
 
     class Meta:
-        table_name = 'props'
+        table_name = 'prop'
 
 class Recipient(BaseModel):
-    date_added = IntegerField(null=True)
-    email = TextField(null=True)
+    data_added = DateField()
+    email = TextField()
 
     class Meta:
         table_name = 'recipient'
