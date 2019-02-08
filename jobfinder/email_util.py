@@ -24,7 +24,7 @@ from dbutil import Dbutil
 from models import Recipient
 
 
-class Emailer(object):
+class EmailUtil(object):
 
     OPENED = 'NEW JOB\n'
 

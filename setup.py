@@ -42,8 +42,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'requests',
-        'lxml',
         'psycopg2',
+        'peewee'
     ],
     package_data={
         'jobfinder': [

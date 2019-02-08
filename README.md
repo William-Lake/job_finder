@@ -175,7 +175,7 @@ jobfinder
 closed or opened recently.
 
 In order to do so, `email` needs a useable email address and password,
-as well as smtp and port info. This information is stored ina  database tabled
+as well as smtp and port info. This information is stored in a  database table
 named `jobfinder.db` for SQLite3, and in a Schema named `jobs` in
 the default `PostgreSQL` installation.
 

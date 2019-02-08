@@ -20,7 +20,6 @@ Manages database interactions.
 import logging
 import os
 import shutil
-import sqlite3
 import sys
 import time
 
@@ -91,17 +90,21 @@ class Dbutil(object):
         Returns
             smtp[1], port[2], email[3] and pword[4]
         """
-        try:
-            conn = sqlite3.connect(Dbutil.get_db_path())
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM props WHERE ROWID = 1')
-            data = cur.fetchone()
-            conn.close()
-            return data
-        except sqlite3.OperationalError as sql3_error:
-            print(f"Failed fetchall on props => {sql3_error}")
-            sys.exit(2)
-            return None
+
+        # TODO Using PostGres now, need to use it instead. This can likely be achieved via models.py
+        # try:
+        #     conn = sqlite3.connect(Dbutil.get_db_path())
+        #     cur = conn.cursor()
+        #     cur.execute('SELECT * FROM props WHERE ROWID = 1')
+        #     data = cur.fetchone()
+        #     conn.close()
+        #     return data
+        # except sqlite3.OperationalError as sql3_error:
+        #     print(f"Failed fetchall on props => {sql3_error}")
+        #     sys.exit(2)
+        #     return None
+
+        pass
 
     @staticmethod
     def get_db_version(db_path):
@@ -111,30 +114,36 @@ class Dbutil(object):
             Tuple row from appdata
 
         """
-        dbv = ""
-        try:
-            with sqlite3.connect(db_path) as conn:
-                cur = conn.cursor()
-                cur.execute('SELECT * FROM appdata '
-                            'ORDER BY ROWID ASC LIMIT 1')
-                for row in cur.fetchall():
-                    dbv = row[3]
-            conn.close()
-            return dbv
-        except sqlite3.OperationalError as sql3_error:
-            print(f"Fetchrow failed=> {sql3_error}")
-            Dbutil.init_db()
+        # TODO Using PostGres now, need to use it instead. This can likely be achieved via models.py
+        # dbv = ""
+        # try:
+        #     with sqlite3.connect(db_path) as conn:
+        #         cur = conn.cursor()
+        #         cur.execute('SELECT * FROM appdata '
+        #                     'ORDER BY ROWID ASC LIMIT 1')
+        #         for row in cur.fetchall():
+        #             dbv = row[3]
+        #     conn.close()
+        #     return dbv
+        # except sqlite3.OperationalError as sql3_error:
+        #     print(f"Fetchrow failed=> {sql3_error}")
+        #     Dbutil.init_db()
+
+        pass
 
     @staticmethod
     def get_db_path():
         """Get AppData Directory based on Platform"""
-        if sys.platform == 'win32':
-            db_name = os.path.abspath(os.path.join(
-                expanduser("~"), 'AppData', 'Local',
-                'jobfinder', DATABASE))
-        else:
-            db_name = os.path.abspath(os.path.join(
-                expanduser("~"), '.local', 'share',
-                'jobfinder', DATABASE))
+        # TODO Using PostGres now, need to use it instead. This can likely be achieved via models.py
+        # if sys.platform == 'win32':
+        #     db_name = os.path.abspath(os.path.join(
+        #         expanduser("~"), 'AppData', 'Local',
+        #         'jobfinder', DATABASE))
+        # else:
+        #     db_name = os.path.abspath(os.path.join(
+        #         expanduser("~"), '.local', 'share',
+        #         'jobfinder', DATABASE))
 
-        return db_name
+        # return db_name
+
+        pass

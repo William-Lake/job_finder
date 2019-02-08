@@ -13,89 +13,26 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""
-Job Finder
 
-Gathers IT Jobs from the State of Montana,
-which are located in Helena, MT, 
-and notifies a group of users about it.
-
-Built for the IT students of UM Helena.
-"""
-
-import sys
 import requests
-from lxml import html
-import time
 import urllib
-import sqlite3
 import logging
 from datetime import datetime
 
 # update for packaging, use . relative path identifiers
-from models import *
-from dbutil import Dbutil
-from emailer import Emailer
+from models import Job
 
 
-class Finder(object):
+class JobUtil(object):
     
-    def __init__(self, args=None):
+    def __init__(self):
         """Constructor"""
 
         self.__logger = logging.getLogger()
 
-        self.__logger.info('Initializing Job Finder')
+        self.__logger.info('Initializing JobUtil')
 
-        self.__emailer = Emailer()
-
-        self.__args = args
-
-    def start(self):
-
-        # TODO Remove the arg parsing, let JobFinder do it.
-
-        self.__logger.info('Starting Job Finder')
-
-        self.__logger.debug('Parsing args.')
-
-        if self.__args is None:
-
-            self.__logger.debug('No args passed.')
-
-            self.__gather_and_review_jobs()
-
-        else:
-
-            self.__logger.debug('Args passed: ' + ' '.join(self.__args))
-
-            target = self.__args[1].strip()
-
-            if self.__args[0].upper().strip() == 'ADD':
-
-                if target.endswith('.txt'): 
-                    
-                    self.__add_recipients(target)
-
-                else:
-
-                    Recipient.create(email = target)
-
-            elif self.__args[0].upper().strip() == 'REMOVE':
-
-                if target.endswith('.txt'):
-
-                    self.__remove_recipients(target)
-
-                else:
-                    
-                    recipient = Recipient.get_or_none(Recipient.email == target)
-
-                    if recipient is not None: Recipient.delete_instance()
-
-                    else: self.__logger.warn(f'User with email ({email}) was not in the database.')
-
-    def __gather_and_review_jobs(self):
+    def gather_and_review_jobs(self):
         """Gathers the jobs from the web,
         compares them to those in the database,
         and notifies the recipients if necessary.
@@ -104,33 +41,7 @@ class Finder(object):
 
         self.__review_jobs()
 
-        self.__notify_recipients()
-
-    def __add_recipients(self, file_name):
-
-        self.__logger.info('Saving Recipients in ' + file_name)
-
-        emails = open(file_name).readlines()
-
-        for email in emails: 
-
-            Recipient.create(
-                email = email.strip(), 
-                date_added = datetime.today().strftime('%Y-%m-%d'))
-
-    def __remove_recipients(self, file_name):
-
-        self.__logger.debug('Removing Recipients in ' + file_name)
-
-        emails = open(file_name).readlines()
-
-        for email in emails: 
-
-            recipient = Recipient.get_or_none(Recipient.email == email.strip())
-
-            if recipient is not None: Recipient.delete_instance()
-
-            else: self.__logger.warn(f'User with email ({email}) was not in the database.')
+        return self.__saved_jobs, self.__closed_jobs
 
     def __review_jobs(self):
         """Gathers all the jobs from the State of MT jobs site,
@@ -258,12 +169,12 @@ class Finder(object):
         current_job_ids = [job.id for job in Job.select().where(Job.date_closed == None)]
 
         # We need only the jobs that aren't in the database already,
-        self.saved_jobs = [job for job in self.jobs_on_site if job.id not in current_job_ids]
+        self.__saved_jobs = [job for job in self.jobs_on_site if job.id not in current_job_ids]
 
         # And we need to save them.
-        for job in self.saved_jobs: job.save()
+        for job in self.__saved_jobs: job.save()
 
-        self.__logger.debug(f'Saved {len(self.saved_jobs)}.')
+        self.__logger.debug(f'Saved {len(self.__saved_jobs)}.')
 
     def __close_jobs(self):
         """From the list of jobs that have been pulled from the web,
@@ -277,30 +188,15 @@ class Finder(object):
         # We need to compare what's current in the db vs what's current on the site.
         current_jobs = Job.select().where(Job.date_closed == None)
 
-        self.closed_jobs = [job for job in current_jobs if job.id not in site_job_ids]
+        self.__closed_jobs = [job for job in current_jobs if job.id not in site_job_ids]
 
         # We need to update the jobs in the database.
-        for job in self.closed_jobs
+        for job in self.__closed_jobs
 
             job.date_closed = datetime.today().strftime('%Y-%m-%d')
 
             job.save()
             
-            self.closed_jobs.append(job)
+            self.__closed_jobs.append(job)
 
-        self.__logger.debug(f'Closed {len(self.closed_jobs)} jobs.')
-
-    def __notify_recipients(self):
-        """Notifies all recipients in the database about a job closing or opening."""
-
-        if len(self.saved_jobs) > 0 or len(self.closed_jobs) > 0:
-
-            self.__logger.info='Notifying Recipients'
-
-            for job in self.saved_jobs: 
-                
-                self.__emailer.notify_recipients_of_job(job, Emailer.OPENED)
-
-            for job in self.closed_jobs: 
-                
-                self.__emailer.notify_recipients_of_job(job, Emailer.CLOSED)
+        self.__logger.debug(f'Closed {len(self.__closed_jobs)} jobs.')
