@@ -10,32 +10,30 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import requests
-import urllib
-import logging
 from datetime import datetime
+import logging
+import requests
 
-# update for packaging, use . relative path identifiers
 from models import Job
 
 
 class JobUtil(object):
-    
+
     def __init__(self):
         """Constructor"""
 
         self.__logger = logging.getLogger()
 
-        self.__logger.info('Initializing JobUtil')
+        self.__logger.info('JobUtil Initialized')
 
     def gather_and_review_jobs(self):
         """Gathers the jobs from the web,
-        compares them to those in the database,
-        and notifies the recipients if necessary.
+        compares them to the ones in the database,
+        and saves/returns the changes found.
         """
         self.__logger.info('Gathering and Reviewing Jobs')
 
@@ -61,42 +59,83 @@ class JobUtil(object):
 
         self.__logger.info('Gathering Jobs From Site')
 
-        self.jobs_on_site = []
-
-        # TODO Consider moving the url, headers, and payload to external files/props
+        self.__jobs_on_site = []
 
         # Prepare everything necessary to gather the webpage data.
         url = 'https://mtstatejobs.taleo.net/careersection/rest/jobboard/searchjobs?lang=en&portal=101430233'
 
-        headers = {'Host': 'mtstatejobs.taleo.net',
-                   'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0',
-                   'Accept': 'application/json, text/javascript, */*; q=0.01',
-                   'Accept-Language': 'en-US,en;q=0.5',
-                   'Accept-Encoding': 'gzip, deflate, br',
-                   'Referer': 'https://mtstatejobs.taleo.net/careersection/200/jobsearch.ftl',
-                   'Content-Type': 'application/json', 'tz': 'GMT-06:00',
-                   'X-Requested-With': 'XMLHttpRequest',
-                   'Content-Length': '702'}
+        headers = {
+            'Host': 'mtstatejobs.taleo.net',
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': 'https://mtstatejobs.taleo.net/careersection/200/jobsearch.ftl',
+            'Content-Type': 'application/json', 'tz': 'GMT-06:00',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Length': '702'
+        }
 
-        payload = {"multilineEnabled": 'false',
-                   "sortingSelection": {"sortBySelectionParam": "5",
-                                        "ascendingSortingOrder": "true"},
-                   "fieldData": {"fields": {"KEYWORD": "", "LOCATION": "",
-                                            "ORGANIZATION": ""},
-                                 "valid": 'true'}, "filterSelectionParam": {
+        payload = {
+            "multilineEnabled": 'false',
+            "sortingSelection": {
+                "sortBySelectionParam": "5",
+                "ascendingSortingOrder": "true"
+            },
+            "fieldData": {
+                "fields": {
+                    "KEYWORD": "",
+                    "LOCATION": "",
+                    "ORGANIZATION": ""
+                },
+                "valid": 'true'
+            },
+            "filterSelectionParam": {
                 "searchFilterSelections": [
-                    {"id": "POSTING_DATE", "selectedValues": []},
-                    {"id": "LOCATION", "selectedValues": ["20300100198"]},
-                    {"id": "JOB_FIELD", "selectedValues": ["7000100198"]}]},
-                   "advancedSearchFiltersSelectionParam": {
-                       "searchFilterSelections": [
-                           {"id": "ORGANIZATION", "selectedValues": []},
-                           {"id": "LOCATION", "selectedValues": []},
-                           {"id": "JOB_FIELD", "selectedValues": []},
-                           {"id": "STUDY_LEVEL", "selectedValues": []},
-                           {"id": "WILL_TRAVEL", "selectedValues": []},
-                           {"id": "JOB_SHIFT", "selectedValues": []}]},
-                   "pageNo": 1}
+                    {
+                        "id": "POSTING_DATE",
+                        "selectedValues": []
+                    },
+                    {
+                        "id": "LOCATION",
+                        "selectedValues": ["20300100198"]
+                    },
+                    {
+                        "id": "JOB_FIELD",
+                        "selectedValues": ["7000100198"]
+                    }
+                ]
+            },
+            "advancedSearchFiltersSelectionParam": {
+                "searchFilterSelections": [
+                    {
+                        "id": "ORGANIZATION",
+                        "selectedValues": []
+                    },
+                    {
+                        "id": "LOCATION",
+                        "selectedValues": []
+                    },
+                    {
+                        "id": "JOB_FIELD",
+                        "selectedValues": []
+                    },
+                    {
+                        "id": "STUDY_LEVEL",
+                        "selectedValues": []
+                    },
+                    {
+                        "id": "WILL_TRAVEL",
+                        "selectedValues": []
+                    },
+                    {
+                        "id": "JOB_SHIFT",
+                        "selectedValues": []
+                    }
+                ]
+            },
+            "pageNo": 1
+        }
 
         session = requests.Session()
 
@@ -108,7 +147,11 @@ class JobUtil(object):
 
         headers['Cookie'] = f'locale={cookie_dict["locale"]}; JSESSIONID={cookie_dict["JSESSIONID"]}'
 
-        response = session.post(url, headers=headers, json=payload)
+        response = session.post(
+            url,
+            headers=headers,
+            json=payload
+        )
 
         if response.status_code == 200:
 
@@ -140,19 +183,29 @@ class JobUtil(object):
                 # Uncomment this to see what else is included.
                 # print(target_data)
 
-                # No way to guarantee that the site_id and contest_num will always be unique, so a hashcode is generated.
-                job_id = hash(site_id + contest_num + site_url + title + dept)
+                '''
+                No way to guarantee that the site_id and contest_num will
+                always be unique, so a hashcode is generated.
+                '''
+                job_id = hash(
+                    site_id
+                    + contest_num
+                    + site_url
+                    + title
+                    + dept
+                )
 
                 # Create a job object with the collected data.
                 new_job = Job(
-                    id = job_id, 
-                    site_id = site_id, 
-                    contest_num = contest_num, 
-                    title = title, 
-                    dept = dept,
-                    site_url = site_url)
+                    id=job_id,
+                    site_id=site_id,
+                    contest_num=contest_num,
+                    title=title,
+                    dept=dept,
+                    site_url=site_url
+                )
 
-                self.jobs_on_site.append(new_job)
+                self.__jobs_on_site.append(new_job)
 
         else:
 
@@ -166,13 +219,24 @@ class JobUtil(object):
         self.__logger.info('Finding Jobs to Save')
 
         # Create a list of the job ids for open jobs in the database.
-        current_job_ids = [job.id for job in Job.select().where(Job.date_closed == None)]
+        db_open_job_ids = [
+            job.id
+            for
+            job in Job.select().where(Job.date_closed == None)
+        ]
 
         # We need only the jobs that aren't in the database already,
-        self.__saved_jobs = [job for job in self.jobs_on_site if job.id not in current_job_ids]
+        self.__saved_jobs = [
+            job
+            for
+            job in self.__jobs_on_site
+            if job.id not in db_open_job_ids
+        ]
 
         # And we need to save them.
-        for job in self.__saved_jobs: job.save()
+        for job in self.__saved_jobs: 
+            
+            job.save()
 
         self.__logger.debug(f'Saved {len(self.__saved_jobs)}.')
 
@@ -183,20 +247,29 @@ class JobUtil(object):
         self.__logger.info('Finding Jobs to close')
 
         # Create a list of the job ids for open jobs in the database.
-        site_job_ids = [job.id for job in self.jobs_on_site]
+        site_job_ids = [
+            job.id
+            for
+            job in self.__jobs_on_site
+        ]
 
         # We need to compare what's current in the db vs what's current on the site.
-        current_jobs = Job.select().where(Job.date_closed == None)
+        db_open_job_ids = Job.select().where(Job.date_closed == None)
 
-        self.__closed_jobs = [job for job in current_jobs if job.id not in site_job_ids]
+        self.__closed_jobs = [
+            job
+            for
+            job in db_open_job_ids
+            if job.id not in site_job_ids
+        ]
 
         # We need to update the jobs in the database.
-        for job in self.__closed_jobs
+        for job in self.__closed_jobs:
 
             job.date_closed = datetime.today().strftime('%Y-%m-%d')
 
             job.save()
-            
+
             self.__closed_jobs.append(job)
 
         self.__logger.debug(f'Closed {len(self.__closed_jobs)} jobs.')

@@ -31,9 +31,10 @@ class Job(BaseModel):
 
 class Prop(BaseModel):
     is_selected = BooleanField(constraints=[SQL("DEFAULT false")])
-    port = IntegerField()
-    pword = CharField()
     smtp = CharField()
+    port = IntegerField()
+    email = CharField()
+    pword = CharField()
 
     class Meta:
         table_name = 'prop'

@@ -121,6 +121,7 @@ CREATE TABLE prop
     id SERIAL,
     smtp VARCHAR (120) NOT NULL,
     port INTEGER NOT NULL,
+    email VARCHAR NOT NULL,
     pword VARCHAR NOT NULL,
     is_selected BOOLEAN NOT NULL DEFAULT '0',
     CONSTRAINT prop_id_pkey PRIMARY KEY (id)
