@@ -37,9 +37,6 @@ class JobFinder(object):
 
         self.__args = args
 
-        # Always check the DB first before any actions to help prevent errors
-        Dbutil.check_db()
-
         self.__load_configuration()
 
         self.__logger = logging.getLogger()
@@ -108,8 +105,25 @@ class JobFinder(object):
         database as indicated by the user.
         '''
 
+        saved_jobs, closed_jobs = JobUtil().gather_and_review_jobs()
+
+        if saved_jobs or closed_jobs:
+
+            self.__logger.info('Notifying Recipients')
+
+            email_util = EmailUtil()
+
+            for job in saved_jobs:
+
+                email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
+
+            for job in closed_jobs:
+
+                email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
+
+        exit()
+
         if (
-            not self.__args.set_email_props and
             not self.__args.add_recip and
             not self.__args.remove_recip and
             not self.__args.recipients
@@ -153,10 +167,6 @@ class JobFinder(object):
 
             raise Exception('Recipients provided with conflicting instructions! Please use the -h flag to determine what arguments to pass to job_finder.')
 
-        elif self.__args.set_email_props:
-
-            Dbutil.gather_props()
-
         else:
 
             recipient_util = RecipientUtil()
@@ -186,18 +196,48 @@ class JobFinder(object):
 
 def main(args):
 
-    job_finder = JobFinder(args)
+    # Always check the DB first before any actions to help prevent errors
+    if Dbutil.check_db():
 
-    try:
+        job_finder = JobFinder(args)
 
-        job_finder.start()
+        try:
 
-    except Exception as e:
+            job_finder.start()
 
-        logging.getLogger().error(
-            f'''
-            There was an error during JobFinder execution:
+        except Exception as e:
 
-                {str(e)}
-            '''
-        )
+            logging.getLogger().error(
+                f'''
+                There was an error during JobFinder execution:
+
+                    {str(e)}
+                '''
+            )
+
+    # if args.setup:
+
+    #     Dbutil.create_tables()
+
+    #     Dbutil.determine_user_props()
+
+    # else:
+
+    #     # Always check the DB first before any actions to help prevent errors
+    #     if Dbutil.check_db():
+
+    #         job_finder = JobFinder(args)
+
+    #         try:
+
+    #             job_finder.start()
+
+    #         except Exception as e:
+
+    #             logging.getLogger().error(
+    #                 f'''
+    #                 There was an error during JobFinder execution:
+
+    #                     {str(e)}
+    #                 '''
+    #             )

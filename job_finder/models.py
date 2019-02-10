@@ -18,11 +18,11 @@ class DatabaseInfo(BaseModel):
         table_name = 'database_info'
 
 class Job(BaseModel):
-    content_num = IntegerField()
+    contest_num = BigIntegerField()
     date_closed = DateField(null=True)
     date_opened = DateField()
     dept = TextField()
-    site_id = IntegerField()
+    site_id = BigIntegerField()
     site_url = TextField()
     title = TextField()
 

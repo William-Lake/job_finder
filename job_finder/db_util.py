@@ -17,9 +17,9 @@
 
 Manages database interactions.
 """
-from getpass import getpass
 import logging
 
+from input_util import InputUtil
 from models import database
 from models import DatabaseInfo
 from models import Job
@@ -34,17 +34,44 @@ class Dbutil(object):
 
     @staticmethod
     def check_db():
+
+        logger = logging.getLogger()
+
+        db_ok = False
+
+        try:
+
+            logger.debug('Checking if database & tables exist.')
+
+            if database.get_tables():
+
+                db_ok = True
+                
+        except Exception as e:
+
+            logger.error("Database doesn't exist!")
+
+            raise Exception(
+                f'''
+                The following error was thrown when trying to connect to the database:
+
+                    {str(e)}
+
+                If you haven't already, please create a PostGreSQL database and provide the connection information in the job_finder_props.py file.
+                '''
+            )
+
+        return db_ok
+
+    @staticmethod
+    def create_tables():
         """Check Database Connection"""
 
         logger = logging.getLogger()
 
-        logger.info('Checking Database')
-
         try:
 
-            logger.debug('Checking if database exists.')
-
-            logger.debug('Checking if database tables exist.')
+            logger.debug('Checking if database & tables exist.')
 
             if not database.get_tables():
 
@@ -72,10 +99,6 @@ class Dbutil(object):
                             {str(e)}
                         '''
                     )
-
-            else:
-
-                Dbutil.get_props()
                 
         except Exception as e:
 
@@ -112,29 +135,67 @@ class Dbutil(object):
             raise Exception('No email properties in the database Prop table!')
 
     @staticmethod
-    def gather_props():
+    def determine_user_props():
+
+        existing_props = Prop.select()
+
+        '''
+        If there's already properties
+            Ask the user if they want to use an existing one
+                If so, let them choose
+                if not, give them the option to create a new one
+            Otherwise give them the option to createa  new one
+        '''
+        if existing_props:
+
+            use_existing = InputUtil.gather_boolean_input(
+                f'There are {len(existing_props)} properties in the database already. Would you like to use one of them?',
+                true_option='Y',
+                false_option='N'
+            )
+
+            if use_existing:
+
+                prop_options = {}
+
+                for prop in existing_props:
+
+                    prop.is_selected = False
+
+                    prop.save()
+
+                    prop_options[prop.email] = prop
+
+                prop_selection = InputUtil.gather_selection_input(prop_options)
+
+                prop_selection.is_selected = True
+
+                prop_selection.save()
+
+            else:
+
+                Dbutil.gather_user_props()
+
+        else:
+
+            Dbutil.gather_user_props()
+
+    @staticmethod
+    def gather_user_props():
 
         prop = Prop()
 
-        for item in ['SMTP','PORT','EMAIL','PASS']:
+        for item in ['SMTP', 'PORT', 'EMAIL', 'PASS']:
 
             prompt = f'{item}?'
 
-            while True:
+            user_input = (
+                InputUtil.gather_input(prompt)
+                if item != 'PASS'
+                else InputUtil.gather_input(prompt, is_password=True)
+            )
 
-                if item != 'PASS':
-
-                    user_input = input(prompt).strip()
-
-                else:
-
-                    user_input = getpass(prompt=prompt).strip()
-
-                if user_input:
-
-                    break
-
-            if item == 'SMTP': 
+            if item == 'SMTP':
 
                 prop.smtp = user_input
 

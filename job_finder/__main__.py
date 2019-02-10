@@ -8,9 +8,9 @@ def gather_args():
     arg_parser = ArgumentParser(description='Gathers and notifies recipients about IT jobs at the State of Montana.')
 
     arg_parser.add_argument(
-        '--set_email_props',
+        '--setup',
         action='store_true',
-        help='Will start a process for gathering and saving to the database properties for sending emails.'
+        help='Creates the database tables and gathers the email properties.'
     )
 
     arg_parser.add_argument(
@@ -42,6 +42,8 @@ def gather_args():
 
 if __name__ == "__main__":
 
-    args = gather_args()
+    # args = gather_args()
 
-    main(args)
+    # main(args)
+
+    main(None)
