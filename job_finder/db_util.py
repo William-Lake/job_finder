@@ -30,7 +30,7 @@ from models import Recipient
 DATABASE = 'jobfinder.db'
 
 
-class Dbutil(object):
+class DbUtil(object):
 
     @staticmethod
     def check_db():
@@ -174,11 +174,11 @@ class Dbutil(object):
 
             else:
 
-                Dbutil.gather_user_props()
+                DbUtil.gather_user_props()
 
         else:
 
-            Dbutil.gather_user_props()
+            DbUtil.gather_user_props()
 
     @staticmethod
     def gather_user_props():

@@ -19,7 +19,7 @@ from email.mime.text import MIMEText
 import logging
 import smtplib
 
-from db_util import Dbutil
+from db_util import DbUtil
 from models import Recipient
 
 
@@ -36,7 +36,7 @@ class EmailUtil(object):
 
         self.__logger.info('Initializing Emailer Util')
 
-        self.smtp, self.port, self.email, self.pword = Dbutil.get_props()
+        self.smtp, self.port, self.email, self.pword = DbUtil.get_props()
 
         # Assumed for now, no current plans to send emails with anything else.
         self.text_subtype = 'plain'

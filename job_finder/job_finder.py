@@ -19,7 +19,7 @@ import logging
 from logging.config import fileConfig
 import os
 
-from db_util import Dbutil
+from db_util import DbUtil
 from email_util import EmailUtil
 from job_util import JobUtil
 from recipient_util import RecipientUtil
@@ -197,7 +197,7 @@ class JobFinder(object):
 def main(args):
 
     # Always check the DB first before any actions to help prevent errors
-    if Dbutil.check_db():
+    if DbUtil.check_db():
 
         job_finder = JobFinder(args)
 
@@ -217,14 +217,14 @@ def main(args):
 
     # if args.setup:
 
-    #     Dbutil.create_tables()
+    #     DbUtil.create_tables()
 
-    #     Dbutil.determine_user_props()
+    #     DbUtil.determine_user_props()
 
     # else:
 
     #     # Always check the DB first before any actions to help prevent errors
-    #     if Dbutil.check_db():
+    #     if DbUtil.check_db():
 
     #         job_finder = JobFinder(args)
 

@@ -43,29 +43,31 @@
 --  BEGIN SCHEMA CREATION
 -- *****************************************************************************
 
+-- PeeWee doesn't support tables within a schema.
+
 \echo ''
 \echo '---------------------------'
 \echo 'Creating Job Finder Schema'
 \echo '---------------------------'
 
 -- Drop, and re-create schema
--- DROP SCHEMA IF EXISTS jobs CASCADE;
+DROP SCHEMA IF EXISTS jobs CASCADE;
 
 -- Create New Schema
--- CREATE SCHEMA jobs;
+CREATE SCHEMA jobs;
 
-DROP TABLE IF EXISTS database_info;
-DROP TABLE IF EXISTS recipient;
-DROP TABLE IF EXISTS job;
-DROP TABLE IF EXISTS prop;
+
+DROP TABLE IF EXISTS jobs.database_info;
+DROP TABLE IF EXISTS jobs.recipient;
+DROP TABLE IF EXISTS jobs.job;
+DROP TABLE IF EXISTS jobs.prop;
 
 -- *****************************************************************************
 --  ADD DATABASE INFO
 -- *****************************************************************************
 
 --R-DaaS Informaiton Table
--- CREATE TABLE jobs.database_info
-CREATE TABLE database_info
+CREATE TABLE jobs.database_info
 (
     id SERIAL,
     author VARCHAR (20),
@@ -73,8 +75,7 @@ CREATE TABLE database_info
     last_update DATE,
     CONSTRAINT database_info_id_pkey PRIMARY KEY (id)
 );
--- INSERT INTO jobs.database_info (id, author, db_version, last_update)
-INSERT INTO database_info (id, author, db_version, last_update)
+INSERT INTO jobs.database_info (id, author, db_version, last_update)
 VALUES(1, 'Greg Beam', '1.0.0', '2019-1-6');
 
 -- *****************************************************************************
@@ -88,8 +89,7 @@ VALUES(1, 'Greg Beam', '1.0.0', '2019-1-6');
 \echo ''
 -- Recipent
 \echo 'Creating Recipient Table'
--- CREATE TABLE jobs.recipient
-CREATE TABLE recipient
+CREATE TABLE jobs.recipient
 (
     id SERIAL,
     email TEXT NOT NULL,
@@ -99,8 +99,7 @@ CREATE TABLE recipient
 
 -- Job
 \echo 'Creating Job Table'
--- CREATE TABLE jobs.job
-CREATE TABLE job
+CREATE TABLE jobs.job
 (
     id SERIAL,
     site_id INTEGER NOT NULL,
@@ -115,8 +114,7 @@ CREATE TABLE job
 
 -- Prop
 \echo 'Creating Prop Table'
--- CREATE TABLE jobs.prop
-CREATE TABLE prop
+CREATE TABLE jobs.prop
 (
     id SERIAL,
     smtp VARCHAR (120) NOT NULL,
@@ -129,16 +127,18 @@ CREATE TABLE prop
 
 -- END table creation
 
+-- *****************************************************************************
+--  BEGIN ROLE CREATION
+-- *****************************************************************************
+
+\echo ''
+\echo '==========================='
+\echo 'Creating jobs_admin User'
+\echo '==========================='
+\echo ''
+
 CREATE USER jobs_admin WITH ENCRYPTED PASSWORD 'jobs_admin';
 
-GRANT ALL PRIVILEGES ON DATABASE jobs TO jobs_admin;
-
-GRANT ALL PRIVILEGES ON TABLE database_info TO jobs_admin;
-
-GRANT ALL PRIVILEGES ON TABLE recipient TO jobs_admin;
-
-GRANT ALL PRIVILEGES ON TABLE job TO jobs_admin;
-
-GRANT ALL PRIVILEGES ON TABLE prop TO jobs_admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA jobs TO jobs_admin;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA PUBLIC TO jobs_admin;
