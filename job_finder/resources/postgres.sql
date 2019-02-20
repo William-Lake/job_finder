@@ -40,27 +40,34 @@
 */
 
 -- *****************************************************************************
---  BEGIN SCHEMA CREATION
+--  BEGIN DATABASE CREATION
 -- *****************************************************************************
 
--- PeeWee doesn't support tables within a schema.
+\echo ''
+\echo '---------------------------'
+\echo 'Creating Job Finder DATABASE'
+\echo '---------------------------'
+
+-- Drop, and re-create schema
+DROP DATABASE IF EXISTS job_finder;
+
+-- Create New Schema
+CREATE DATABASE job_finder;
+
+-- Switching to your newly created database so the following commands will work.
+\c job_finder;
+
+-- *****************************************************************************
+--  BEGIN SCHEMA CREATION
+-- *****************************************************************************
 
 \echo ''
 \echo '---------------------------'
 \echo 'Creating Job Finder Schema'
 \echo '---------------------------'
 
--- Drop, and re-create schema
-DROP SCHEMA IF EXISTS jobs CASCADE;
-
 -- Create New Schema
 CREATE SCHEMA jobs;
-
-
-DROP TABLE IF EXISTS jobs.database_info;
-DROP TABLE IF EXISTS jobs.recipient;
-DROP TABLE IF EXISTS jobs.job;
-DROP TABLE IF EXISTS jobs.prop;
 
 -- *****************************************************************************
 --  ADD DATABASE INFO
@@ -127,6 +134,27 @@ CREATE TABLE jobs.prop
 
 -- END table creation
 
+--******************************************************************************
+-- CREATE TABLE VIEWS
+--******************************************************************************
+
+\echo ''
+\echo '==========================='
+\echo 'Creating Views'
+\echo '==========================='
+\echo ''
+
+-- View  : jobs.all_job_view
+-- Usage : select * from jobs.job_view
+\echo 'jobs.open_job_view'
+CREATE OR REPLACE VIEW jobs.open_job_view AS
+    SELECT *
+    FROM jobs.job j
+    WHERE j.date_closed IS NULL
+    ORDER BY j.date_opened DESC;
+
+-- END view creation
+
 -- *****************************************************************************
 --  BEGIN ROLE CREATION
 -- *****************************************************************************
@@ -137,8 +165,24 @@ CREATE TABLE jobs.prop
 \echo '==========================='
 \echo ''
 
+DROP USER IF EXISTS jobs_admin;
+
 CREATE USER jobs_admin WITH ENCRYPTED PASSWORD 'jobs_admin';
 
+GRANT ALL PRIVILEGES ON DATABASE job_finder TO jobs_admin;
+
+GRANT ALL PRIVILEGES ON SCHEMA jobs TO jobs_admin;
+
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA jobs TO jobs_admin;
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA jobs TO jobs_admin;
+
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA jobs TO jobs_admin;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA jobs GRANT ALL PRIVILEGES ON TABLES TO jobs_admin;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA jobs GRANT ALL PRIVILEGES ON SEQUENCES TO jobs_admin;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA jobs GRANT ALL PRIVILEGES ON FUNCTIONS TO jobs_admin;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA PUBLIC TO jobs_admin;
