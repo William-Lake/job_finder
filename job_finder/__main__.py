@@ -46,4 +46,10 @@ if __name__ == "__main__":
 
     # main(args)
 
+    # TESTING
     main(None)
+
+    # TODO Figure out why both of these are returning 0.
+    # print(len(database.get_tables()))
+
+    # print(len(database.get_views()))

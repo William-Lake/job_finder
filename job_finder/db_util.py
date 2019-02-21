@@ -19,15 +19,16 @@ Manages database interactions.
 """
 import logging
 
+from peewee import OperationalError
+from peewee import ProgrammingError
+
 from input_util import InputUtil
 from models import database
 from models import DatabaseInfo
 from models import Job
 from models import Prop
 from models import Recipient
-
-# This variable should comde from __init__.py but it's not working yet.
-DATABASE = 'jobfinder.db'
+from models import OpenJobView
 
 
 class DbUtil(object):
@@ -37,19 +38,31 @@ class DbUtil(object):
 
         logger = logging.getLogger()
 
+        error = None
+
         db_ok = False
 
         try:
 
-            logger.debug('Checking if database & tables exist.')
+            logger.debug('Checking if database/schema exists')
 
-            if database.get_tables():
+            num_tables = len(database.get_tables())
 
-                db_ok = True
-                
-        except Exception as e:
+            db_ok = num_tables > 0
+
+        except OperationalError as e:
 
             logger.error("Database doesn't exist!")
+
+            error = e
+
+        except ProgrammingError as e:
+
+            logger.error("Schema doesn't exist!")
+
+            error = e
+
+        if error:
 
             raise Exception(
                 f'''
@@ -57,7 +70,8 @@ class DbUtil(object):
 
                     {str(e)}
 
-                If you haven't already, please create a PostGreSQL database and provide the connection information in the job_finder_props.py file.
+                If you haven't already, please create a PostGreSQL database and required schema.
+                The easiest way to do so is via the provided postgres.sql file.
                 '''
             )
 
@@ -69,49 +83,19 @@ class DbUtil(object):
 
         logger = logging.getLogger()
 
-        try:
+        num_tables = len(database.get_tables())
 
-            logger.debug('Checking if database & tables exist.')
+        if num_tables == 0:
 
-            if not database.get_tables():
+            logger.info('Creating Tables')
 
-                logger.debug('Creating database tables.')
-
-                try:
-
-                    database.create_tables(
-                        [
-                            DatabaseInfo,
-                            Job,
-                            Recipient,
-                            Prop
-                        ]
-                    )
-
-                except Exception as e:
-
-                    logger.error(f'Error while trying to create tables: {str(e)}')
-
-                    print(
-                        f'''
-                        There was an error while trying to create the database:
-
-                            {str(e)}
-                        '''
-                    )
-                
-        except Exception as e:
-
-            logger.error("Database doesn't exist!")
-
-            raise Exception(
-                f'''
-                The following error was thrown when trying to connect to the database:
-
-                    {str(e)}
-
-                If you haven't already, please create a PostGreSQL database and provide the connection information in the job_finder_props.py file.
-                '''
+            database.create_tables(
+                [
+                    DatabaseInfo,
+                    Job,
+                    Recipient,
+                    Prop
+                ]
             )
 
     @staticmethod

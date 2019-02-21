@@ -35,6 +35,8 @@ class JobFinder(object):
 
     def __init__(self, args):
 
+        # TODO: Figure out how to address the user wanting to use a different password.
+
         self.__args = args
 
         self.__load_configuration()
@@ -55,6 +57,8 @@ class JobFinder(object):
             the configuration file (default=/etc/package/logging.conf)
         :type config_file: str
         """
+
+        # TODO: Figure out why the logging file wasn't loading
 
         logging.basicConfig(level=logging.DEBUG)
 
@@ -105,23 +109,25 @@ class JobFinder(object):
         database as indicated by the user.
         '''
 
-        saved_jobs, closed_jobs = JobUtil().gather_and_review_jobs()
+        # TESTING ===================================
+        # saved_jobs, closed_jobs = JobUtil().gather_and_review_jobs()
 
-        if saved_jobs or closed_jobs:
+        # if saved_jobs or closed_jobs:
 
-            self.__logger.info('Notifying Recipients')
+        #     self.__logger.info('Notifying Recipients')
 
-            email_util = EmailUtil()
+        #     email_util = EmailUtil()
 
-            for job in saved_jobs:
+        #     for job in saved_jobs:
 
-                email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
+        #         email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
 
-            for job in closed_jobs:
+        #     for job in closed_jobs:
 
-                email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
+        #         email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
 
-        exit()
+        # exit()
+        # TESTING ===================================
 
         if (
             not self.__args.add_recip and
@@ -196,8 +202,39 @@ class JobFinder(object):
 
 def main(args):
 
+    # TESTING =================================================
+
     # Always check the DB first before any actions to help prevent errors
-    if DbUtil.check_db():
+    # DbUtil.check_db()
+
+    # job_finder = JobFinder(args)
+
+    # try:
+
+    #     job_finder.start()
+
+    # except Exception as e:
+
+    #     logging.getLogger().error(
+    #         f'''
+    #         There was an error during JobFinder execution:
+
+    #             {str(e)}
+    #         '''
+    #     )
+
+    # TESTING =================================================
+
+    # Always check the DB first before any actions to help prevent errors
+    DbUtil.check_db()
+
+    if args.setup:
+
+        DbUtil.create_tables()
+
+        DbUtil.determine_user_props()
+
+    else:
 
         job_finder = JobFinder(args)
 
@@ -214,30 +251,3 @@ def main(args):
                     {str(e)}
                 '''
             )
-
-    # if args.setup:
-
-    #     DbUtil.create_tables()
-
-    #     DbUtil.determine_user_props()
-
-    # else:
-
-    #     # Always check the DB first before any actions to help prevent errors
-    #     if DbUtil.check_db():
-
-    #         job_finder = JobFinder(args)
-
-    #         try:
-
-    #             job_finder.start()
-
-    #         except Exception as e:
-
-    #             logging.getLogger().error(
-    #                 f'''
-    #                 There was an error during JobFinder execution:
-
-    #                     {str(e)}
-    #                 '''
-    #             )

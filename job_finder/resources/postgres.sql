@@ -69,91 +69,91 @@ CREATE DATABASE job_finder;
 -- Create New Schema
 CREATE SCHEMA jobs;
 
--- *****************************************************************************
---  ADD DATABASE INFO
--- *****************************************************************************
+-- -- *****************************************************************************
+-- --  ADD DATABASE INFO
+-- -- *****************************************************************************
 
---R-DaaS Informaiton Table
-CREATE TABLE jobs.database_info
-(
-    id SERIAL,
-    author VARCHAR (20),
-    db_version VARCHAR(10),
-    last_update DATE,
-    CONSTRAINT database_info_id_pkey PRIMARY KEY (id)
-);
-INSERT INTO jobs.database_info (id, author, db_version, last_update)
-VALUES(1, 'Greg Beam', '1.0.0', '2019-1-6');
+-- --R-DaaS Informaiton Table
+-- CREATE TABLE jobs.database_info
+-- (
+--     id SERIAL,
+--     author VARCHAR (20),
+--     db_version VARCHAR(10),
+--     last_update DATE,
+--     CONSTRAINT database_info_id_pkey PRIMARY KEY (id)
+-- );
+-- INSERT INTO jobs.database_info (id, author, db_version, last_update)
+-- VALUES(1, 'Greg Beam', '1.0.0', '2019-1-6');
 
--- *****************************************************************************
---  BEGIN TABLE CREATION
--- *****************************************************************************
+-- -- *****************************************************************************
+-- --  BEGIN TABLE CREATION
+-- -- *****************************************************************************
 
-\echo ''
-\echo '==========================='
-\echo 'Creating Tables'
-\echo '==========================='
-\echo ''
--- Recipent
-\echo 'Creating Recipient Table'
-CREATE TABLE jobs.recipient
-(
-    id SERIAL,
-    email TEXT NOT NULL,
-    data_added DATE NOT NULL,
-    CONSTRAINT recipient_id_pkey PRIMARY KEY (id)
-);
+-- \echo ''
+-- \echo '==========================='
+-- \echo 'Creating Tables'
+-- \echo '==========================='
+-- \echo ''
+-- -- Recipent
+-- \echo 'Creating Recipient Table'
+-- CREATE TABLE jobs.recipient
+-- (
+--     id SERIAL,
+--     email TEXT NOT NULL,
+--     data_added DATE NOT NULL,
+--     CONSTRAINT recipient_id_pkey PRIMARY KEY (id)
+-- );
 
--- Job
-\echo 'Creating Job Table'
-CREATE TABLE jobs.job
-(
-    id SERIAL,
-    site_id INTEGER NOT NULL,
-    content_num INTEGER NOT NULL,
-    title TEXT NOT NULL NOT NULL,
-    dept TEXT NOT NULL NOT NULL,
-    site_url TEXT NOT NULL,
-    date_opened DATE NOT NULL,
-    date_closed DATE,
-    CONSTRAINT job_id_pkey PRIMARY KEY (id)
-);
+-- -- Job
+-- \echo 'Creating Job Table'
+-- CREATE TABLE jobs.job
+-- (
+--     id SERIAL,
+--     site_id INTEGER NOT NULL,
+--     content_num INTEGER NOT NULL,
+--     title TEXT NOT NULL NOT NULL,
+--     dept TEXT NOT NULL NOT NULL,
+--     site_url TEXT NOT NULL,
+--     date_opened DATE NOT NULL,
+--     date_closed DATE,
+--     CONSTRAINT job_id_pkey PRIMARY KEY (id)
+-- );
 
--- Prop
-\echo 'Creating Prop Table'
-CREATE TABLE jobs.prop
-(
-    id SERIAL,
-    smtp VARCHAR (120) NOT NULL,
-    port INTEGER NOT NULL,
-    email VARCHAR NOT NULL,
-    pword VARCHAR NOT NULL,
-    is_selected BOOLEAN NOT NULL DEFAULT '0',
-    CONSTRAINT prop_id_pkey PRIMARY KEY (id)
-);
+-- -- Prop
+-- \echo 'Creating Prop Table'
+-- CREATE TABLE jobs.prop
+-- (
+--     id SERIAL,
+--     smtp VARCHAR (120) NOT NULL,
+--     port INTEGER NOT NULL,
+--     email VARCHAR NOT NULL,
+--     pword VARCHAR NOT NULL,
+--     is_selected BOOLEAN NOT NULL DEFAULT '0',
+--     CONSTRAINT prop_id_pkey PRIMARY KEY (id)
+-- );
 
--- END table creation
+-- -- END table creation
 
---******************************************************************************
--- CREATE TABLE VIEWS
---******************************************************************************
+-- --******************************************************************************
+-- -- CREATE TABLE VIEWS
+-- --******************************************************************************
 
-\echo ''
-\echo '==========================='
-\echo 'Creating Views'
-\echo '==========================='
-\echo ''
+-- \echo ''
+-- \echo '==========================='
+-- \echo 'Creating Views'
+-- \echo '==========================='
+-- \echo ''
 
--- View  : jobs.all_job_view
--- Usage : select * from jobs.job_view
-\echo 'jobs.open_job_view'
-CREATE OR REPLACE VIEW jobs.open_job_view AS
-    SELECT *
-    FROM jobs.job j
-    WHERE j.date_closed IS NULL
-    ORDER BY j.date_opened DESC;
+-- -- View  : jobs.all_job_view
+-- -- Usage : select * from jobs.job_view
+-- \echo 'jobs.open_job_view'
+-- CREATE OR REPLACE VIEW jobs.open_job_view AS
+--     SELECT *
+--     FROM jobs.job j
+--     WHERE j.date_closed IS NULL
+--     ORDER BY j.date_opened DESC;
 
--- END view creation
+-- -- END view creation
 
 -- *****************************************************************************
 --  BEGIN ROLE CREATION
