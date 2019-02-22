@@ -36,39 +36,72 @@ class DbUtil(object):
     @staticmethod
     def check_db():
 
-        logger = logging.getLogger()
-
         error = None
 
         db_ok = False
 
         try:
 
-            logger.debug('Checking if database/schema exists')
+            # Determine if any tables are missing
+            missing_tables = [
+                table
+                for table
+                in [DatabaseInfo, Prop, Job, Recipient, OpenJobView]
+                if not table.table_exists()
+            ]
 
-            num_tables = len(database.get_tables())
+            db_ok = not missing_tables
 
-            db_ok = num_tables > 0
+            if db_ok:
 
-        except OperationalError as e:
+                # Determine if there are any Prop records
+                all_props = Prop.select()
 
-            logger.error("Database doesn't exist!")
+                if all_props:
+
+                    # Determine if there are any selected Prop records
+                    selected_props = [
+                        prop
+                        for prop
+                        in all_props
+                        if prop.is_selected
+                    ]
+
+                    if not selected_props:
+
+                        error = Exception(
+                            f'''
+                            No selected records in the Prop table,
+                            which are required for sending emails to recipients.
+                            Please run job_finder with the --setup flag.
+                            '''
+                        )
+
+                        db_ok = False
+
+                else:
+
+                    error = Exception(
+                        f'''
+                        No records in the Prop table,
+                        which are required for sending emails to recipients.
+                        Please run job_finder with the --setup flag.
+                        '''
+                    )
+
+                    db_ok = False
+
+        except Exception as e:
 
             error = e
 
-        except ProgrammingError as e:
-
-            logger.error("Schema doesn't exist!")
-
-            error = e
-
-        if error:
+        if error
 
             raise Exception(
                 f'''
                 The following error was thrown when trying to connect to the database:
 
-                    {str(e)}
+                    {str(error)}
 
                 If you haven't already, please create a PostGreSQL database and required schema.
                 The easiest way to do so is via the provided postgres.sql file.
@@ -81,22 +114,45 @@ class DbUtil(object):
     def create_tables():
         """Check Database Connection"""
 
-        logger = logging.getLogger()
+        missing_tables = [
+            table
+            for table
+            in [DatabaseInfo, Prop, Job, Recipient, OpenJobView]
+            if not table.table_exists()
+        ]
 
-        num_tables = len(database.get_tables())
+        existing_tables = [
+            table
+            for table
+            in [DatabaseInfo, Prop, Job, Recipient, OpenJobView]
+            if table not in missing_tables
+        ]
 
-        if num_tables == 0:
+        if 0 < len(missing_tables) and len(missing_tables) < 5:
 
-            logger.info('Creating Tables')
+            for table in existing_tables:
 
-            database.create_tables(
-                [
-                    DatabaseInfo,
-                    Job,
-                    Recipient,
-                    Prop
-                ]
-            )
+                if table.select():
+
+                    # TODO: Improve this message.
+                    raise Exception(
+                        f'''
+                        Some, but not all of the required tables exist.
+                        Some of the existing tables contain records.
+                        The database is only partially formed.
+                        Please backup the data you'd like to keep, and delete the existing tables.
+                        '''
+                    )
+
+        database.create_tables(
+            [
+                DatabaseInfo,
+                Job,
+                Recipient,
+                Prop,
+                OpenJobView
+            ]
+        )
 
     @staticmethod
     def get_props():

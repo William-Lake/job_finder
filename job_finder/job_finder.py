@@ -110,23 +110,23 @@ class JobFinder(object):
         '''
 
         # TESTING ===================================
-        # saved_jobs, closed_jobs = JobUtil().gather_and_review_jobs()
+        saved_jobs, closed_jobs = JobUtil().gather_and_review_jobs()
 
-        # if saved_jobs or closed_jobs:
+        if saved_jobs or closed_jobs:
 
-        #     self.__logger.info('Notifying Recipients')
+            self.__logger.info('Notifying Recipients')
 
-        #     email_util = EmailUtil()
+            email_util = EmailUtil()
 
-        #     for job in saved_jobs:
+            for job in saved_jobs:
 
-        #         email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
+                email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
 
-        #     for job in closed_jobs:
+            for job in closed_jobs:
 
-        #         email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
+                email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
 
-        # exit()
+        exit()
         # TESTING ===================================
 
         if (
@@ -205,49 +205,53 @@ def main(args):
     # TESTING =================================================
 
     # Always check the DB first before any actions to help prevent errors
-    # DbUtil.check_db()
+    db_ok = DbUtil.check_db()
 
-    # job_finder = JobFinder(args)
+    if not db_ok:
 
-    # try:
+        DbUtil.create_tables()
 
-    #     job_finder.start()
+    job_finder = JobFinder(args)
 
-    # except Exception as e:
+    try:
 
-    #     logging.getLogger().error(
-    #         f'''
-    #         There was an error during JobFinder execution:
+        job_finder.start()
 
-    #             {str(e)}
-    #         '''
-    #     )
+    except Exception as e:
+
+        logging.getLogger().error(
+            f'''
+            There was an error during JobFinder execution:
+
+                {str(e)}
+            '''
+        )
 
     # TESTING =================================================
 
     # Always check the DB first before any actions to help prevent errors
-    DbUtil.check_db()
+    # DbUtil.check_db()
 
-    if args.setup:
+    # if args.setup:
 
-        DbUtil.create_tables()
+    #     DbUtil.create_tables()
 
-        DbUtil.determine_user_props()
+    #     DbUtil.determine_user_props()
 
-    else:
+    # else:
 
-        job_finder = JobFinder(args)
+    #     job_finder = JobFinder(args)
 
-        try:
+    #     try:
 
-            job_finder.start()
+    #         job_finder.start()
 
-        except Exception as e:
+    #     except Exception as e:
 
-            logging.getLogger().error(
-                f'''
-                There was an error during JobFinder execution:
+    #         logging.getLogger().error(
+    #             f'''
+    #             There was an error during JobFinder execution:
 
-                    {str(e)}
-                '''
-            )
+    #                 {str(e)}
+    #             '''
+    #         )
