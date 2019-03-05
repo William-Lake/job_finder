@@ -120,11 +120,15 @@ class JobFinder(object):
 
             for job in saved_jobs:
 
-                email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
+                print(job)
+
+                # email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
 
             for job in closed_jobs:
 
-                email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
+                print(job)
+
+                # email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
 
         exit()
         # TESTING ===================================

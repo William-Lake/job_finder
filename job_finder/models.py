@@ -31,21 +31,6 @@ class Job(BaseModel):
         table_name = 'job'
         schema = 'jobs'
 
-class OpenJobView(BaseModel):
-    content_num = IntegerField(null=True)
-    date_closed = DateField(null=True)
-    date_opened = DateField(null=True)
-    dept = TextField(null=True)
-    id = IntegerField(null=True)
-    site_id = IntegerField(null=True)
-    site_url = TextField(null=True)
-    title = TextField(null=True)
-
-    class Meta:
-        table_name = 'open_job_view'
-        schema = 'jobs'
-        primary_key = False
-
 class Prop(BaseModel):
     email = CharField()
     is_selected = BooleanField(constraints=[SQL("DEFAULT false")])

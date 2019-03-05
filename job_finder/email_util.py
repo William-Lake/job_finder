@@ -62,11 +62,11 @@ class EmailUtil(object):
         Full Posting: {job.site_url}
         '''
 
-        # for recipient in Recipient.select():
+        for recipient in Recipient.select():
 
-        #     self.__create_message(job, email_body, recipient.email, status)
+            self.__create_message(job, email_body, recipient.email, status)
 
-        #     self.__send_email(recipient.email)
+            self.__send_email(recipient.email)
 
     def __create_message(self, job, email_body, recipient_email, status):
         """Creates an email message.

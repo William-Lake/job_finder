@@ -28,7 +28,6 @@ from models import DatabaseInfo
 from models import Job
 from models import Prop
 from models import Recipient
-from models import OpenJobView
 
 
 class DbUtil(object):
@@ -36,17 +35,25 @@ class DbUtil(object):
     @staticmethod
     def check_db():
 
+        '''
+        Db Ok if:
+
+            No tables are missing
+            One of the records in the Props table is selected
+            No errors occur when making the checks.
+        '''
+
         error = None
 
         db_ok = False
 
         try:
 
-            # Determine if any tables are missing
+            # Collect any missing tables
             missing_tables = [
                 table
                 for table
-                in [DatabaseInfo, Prop, Job, Recipient, OpenJobView]
+                in [DatabaseInfo, Prop, Job, Recipient]
                 if not table.table_exists()
             ]
 
@@ -89,13 +96,11 @@ class DbUtil(object):
                         '''
                     )
 
-                    db_ok = False
-
         except Exception as e:
 
             error = e
 
-        if error
+        if error:
 
             raise Exception(
                 f'''
@@ -117,14 +122,14 @@ class DbUtil(object):
         missing_tables = [
             table
             for table
-            in [DatabaseInfo, Prop, Job, Recipient, OpenJobView]
+            in [DatabaseInfo, Prop, Job, Recipient]
             if not table.table_exists()
         ]
 
         existing_tables = [
             table
             for table
-            in [DatabaseInfo, Prop, Job, Recipient, OpenJobView]
+            in [DatabaseInfo, Prop, Job, Recipient]
             if table not in missing_tables
         ]
 
@@ -136,11 +141,12 @@ class DbUtil(object):
 
                     # TODO: Improve this message.
                     raise Exception(
-                        f'''
+                        '''
                         Some, but not all of the required tables exist.
                         Some of the existing tables contain records.
                         The database is only partially formed.
-                        Please backup the data you'd like to keep, and delete the existing tables.
+                        Please backup the data you'd like to keep,
+                        delete the existing tables then try again.
                         '''
                     )
 
@@ -149,8 +155,7 @@ class DbUtil(object):
                 DatabaseInfo,
                 Job,
                 Recipient,
-                Prop,
-                OpenJobView
+                Prop
             ]
         )
 
@@ -170,9 +175,9 @@ class DbUtil(object):
 
         else:
 
-            logging.getLogger().error('No email properties in the database Prop table!')
+            logging.getLogger().error('No email properties selected in the database Prop table!')
 
-            raise Exception('No email properties in the database Prop table!')
+            raise Exception('No email properties selected in the database Prop table!')
 
     @staticmethod
     def determine_user_props():
