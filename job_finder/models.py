@@ -19,7 +19,7 @@ class DatabaseInfo(BaseModel):
         schema = 'jobs'
 
 class Job(BaseModel):
-    content_num = IntegerField()
+    contest_num = IntegerField()
     date_closed = DateField(null=True)
     date_opened = DateField()
     dept = TextField()
@@ -43,7 +43,7 @@ class Prop(BaseModel):
         schema = 'jobs'
 
 class Recipient(BaseModel):
-    data_added = DateField()
+    date_added = DateField()
     email = TextField()
 
     class Meta:

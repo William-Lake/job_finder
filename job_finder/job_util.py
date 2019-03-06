@@ -37,22 +37,13 @@ class JobUtil(object):
         """
         self.__logger.info('Gathering and Reviewing Jobs')
 
-        self.__review_jobs()
-
-        return self.__saved_jobs, self.__closed_jobs
-
-    def __review_jobs(self):
-        """Gathers all the jobs from the State of MT jobs site,
-        saving those that are new,
-        and deleting those that have closed.
-        """
-        self.__logger.info('Reviewing Jobs')
-
         self.__gather_jobs_on_site()
 
         self.__save_jobs()
 
         self.__close_jobs()
+
+        return self.__saved_jobs, self.__closed_jobs
 
     def __gather_jobs_on_site(self):
         """Grabs the jobs from the State of MT website."""

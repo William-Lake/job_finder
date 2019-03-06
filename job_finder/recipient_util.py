@@ -13,15 +13,17 @@ class RecipientUtil(object):
 
         self.__logger.info('RecipientUtil Initialized')
 
-    def add_from_file(self, file_name):
+    def add_from_files(self, file_names):
 
-        self.__review_file(file_name)
+        for file_name in file_names:
 
-        self.__logger.info(f'Adding Recipients in {file_name}.')
+            if self.__file_ok(file_name):
 
-        recipient_emails = open(file_name).readlines()
+                self.__logger.info(f'Adding Recipients in {file_name}.')
 
-        self.add_recipients(recipient_emails)
+                recipient_emails = open(file_name).readlines()
+
+                self.add_recipients(recipient_emails)
 
     def add(self, recipient_emails):
 
@@ -34,15 +36,17 @@ class RecipientUtil(object):
                 date_added=datetime.today().strftime('%Y-%m-%d')
             )
 
-    def remove_from_file(self, file_name):
+    def remove_from_files(self, file_names):
 
-        self.__review_file(file_name)
+        for file_name in file_names:
 
-        self.__logger.info('Removing Recipients in ' + file_name)
+            if self.__file_ok(file_name):
 
-        recipient_emails = open(file_name).readlines()
+                self.__logger.info(f'Removing Recipients in {file_name}.')
 
-        self.remove_recipients(recipient_emails)
+                recipient_emails = open(file_name).readlines()
+
+                self.remove_recipients(recipient_emails)
 
     def remove(self, recipient_emails):
 
@@ -62,20 +66,22 @@ class RecipientUtil(object):
                     f'Recipient {email} was not in the database.'
                 )
 
-    def __review_file(self, file_name):
+    def __file_ok(self, file_name):
 
         file_name = file_name.strip()
 
+        file_ok = True
+
         if not os.path.exists(file_name):
 
-            self.__raise_file_exception("Provided file doesn't exist!")
+            self.__logger.error(f"{file_name} doesn't exist!")
+
+            file_ok = False
 
         if not file_name.endswith('.txt'):
 
-            self.__raise_file_exception("Provided file isn't a .txt file!")
+            self.__logger.error(f"{file_name} isn't a .txt file!")
 
-    def __raise_file_exception(self, message):
+            file_ok = False
 
-        self.__logger.warning(message)
-
-        raise Exception(message)
+        return file_ok

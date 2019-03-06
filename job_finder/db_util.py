@@ -119,45 +119,57 @@ class DbUtil(object):
     def create_tables():
         """Check Database Connection"""
 
-        missing_tables = [
-            table
-            for table
-            in [DatabaseInfo, Prop, Job, Recipient]
-            if not table.table_exists()
-        ]
+        tables_created = True
 
-        existing_tables = [
-            table
-            for table
-            in [DatabaseInfo, Prop, Job, Recipient]
-            if table not in missing_tables
-        ]
+        try:
 
-        if 0 < len(missing_tables) and len(missing_tables) < 5:
-
-            for table in existing_tables:
-
-                if table.select():
-
-                    # TODO: Improve this message.
-                    raise Exception(
-                        '''
-                        Some, but not all of the required tables exist.
-                        Some of the existing tables contain records.
-                        The database is only partially formed.
-                        Please backup the data you'd like to keep,
-                        delete the existing tables then try again.
-                        '''
-                    )
-
-        database.create_tables(
-            [
-                DatabaseInfo,
-                Job,
-                Recipient,
-                Prop
+            missing_tables = [
+                table
+                for table
+                in [DatabaseInfo, Prop, Job, Recipient]
+                if not table.table_exists()
             ]
-        )
+
+            existing_tables = [
+                table
+                for table
+                in [DatabaseInfo, Prop, Job, Recipient]
+                if table not in missing_tables
+            ]
+
+            if 0 < len(missing_tables) and len(missing_tables) < 5:
+
+                for table in existing_tables:
+
+                    if table.select():
+
+                        # TODO: Improve this message.
+                        raise Exception(
+                            '''
+                            Some, but not all of the required tables exist.
+                            Some of the existing tables contain records.
+                            The database is only partially formed.
+                            Please backup the data you'd like to keep,
+                            delete the existing tables then try again.
+                            '''
+                        )
+
+            database.create_tables(
+                [
+                    DatabaseInfo,
+                    Job,
+                    Recipient,
+                    Prop
+                ]
+            )
+
+        except Exception as e:
+
+            logging.getLogger().error(f'Error while creating tables: {str(e)}')
+
+            tables_created = False
+
+        return tables_created
 
     @staticmethod
     def get_props():
@@ -191,6 +203,7 @@ class DbUtil(object):
                 if not, give them the option to create a new one
             Otherwise give them the option to createa  new one
         '''
+
         if existing_props:
 
             use_existing = InputUtil.gather_boolean_input(

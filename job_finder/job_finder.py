@@ -29,63 +29,38 @@ class JobFinder(object):
     '''Manages the process of gathering jobs from
     the state of montana job site.'''
 
-    DEFAULT_CONFIG_FILE = os.path.join(
-        os.path.dirname(
-            os.path.abspath(__file__)), 'logging.conf')
-
     def __init__(self, args):
 
         # TODO: Figure out how to address the user wanting to use a different password.
 
         self.__args = args
 
-        self.__load_configuration()
-
         self.__logger = logging.getLogger()
 
-        self.__logger.info('JobFinder Initialized')
+        self.__setup()
 
-    def __load_configuration(self, config_file=DEFAULT_CONFIG_FILE):
-        """
-        Loads logging configuration from the given configuration file.
+    def __setup(self):
 
-        Code from: https://github.com/storj/storj-python-sdk/blob/master/tests/log_config.py
+        self.do_execute = True
 
-        Code found via: https://www.programcreek.com/python/example/105587/logging.config.fileConfig
+        # Always check the DB first before any actions to help prevent errors
+        db_ok = DbUtil.check_db()
 
-        :param config_file:
-            the configuration file (default=/etc/package/logging.conf)
-        :type config_file: str
-        """
+        if not db_ok:
 
-        # TODO: Figure out why the logging file wasn't loading
+            self.__logger.info('Creating JobFinder Tables.')
 
-        logging.basicConfig(level=logging.DEBUG)
+            tables_created = DbUtil.create_tables()
 
-        # if (
-        #     not os.path.exists(config_file) or
-        #         not os.path.isfile(config_file)):
+            if not tables_created:
 
-        #     msg = '%s configuration file does not exist!', config_file
+                self.do_execute = False
 
-        #     logging.getLogger().error(msg)
+                self.__logger.info('Error during JobFinder Table Creation.')
 
-        #     raise ValueError(msg)
+            else:
 
-        # try:
-        #     fileConfig(config_file, disable_existing_loggers=False)
-
-        #     logging.getLogger().info('%s configuration file was loaded.',
-        #                              config_file)
-
-        # except Exception as e:
-
-        #     logging.getLogger().error('Failed to load configuration from %s!',
-        #                               config_file)
-
-        #     logging.getLogger().debug(str(e), exc_info=True)
-
-        #     raise e
+                self.__logger.info('JobFinder Initialized')
 
     def start(self):
 
@@ -109,29 +84,15 @@ class JobFinder(object):
         database as indicated by the user.
         '''
 
-        # TESTING ===================================
-        saved_jobs, closed_jobs = JobUtil().gather_and_review_jobs()
-
-        if saved_jobs or closed_jobs:
-
-            self.__logger.info('Notifying Recipients')
-
-            email_util = EmailUtil()
-
-            for job in saved_jobs:
-
-                print(job)
-
-                # email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
-
-            for job in closed_jobs:
-
-                print(job)
-
-                # email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
-
-        exit()
-        # TESTING ===================================
+        '''
+        Regular execution - GOOD
+        Regular Execution with no Db - GOOD
+        Add one recipient
+        Add multiple recipients
+        Remove one recipient
+        Remove multiple recipients
+        Try to both add and remove recipients
+        '''
 
         if (
             not self.__args.add_recip and
@@ -151,11 +112,15 @@ class JobFinder(object):
 
                 for job in saved_jobs:
 
-                    email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
+                    print(job.title)
+
+                    # email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
 
                 for job in closed_jobs:
 
-                    email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
+                    print(job.title)
+
+                    # email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
 
         elif (
             not self.__args.add_recip and
@@ -183,79 +148,79 @@ class JobFinder(object):
 
             if self.__args.add_recip:
 
-                if self.__args.use_recip_file:
+                recipients = [
+                    recipient
+                    for recipient
+                    in self.__args.recipients
+                    if '@' in recipient
+                ]
 
-                    recipient_util.add_from_file(self.__args.recipients[0])
+                recipient_files = [
+                    recipient_file
+                    for recipient_file
+                    in self.__args.recipients
+                    if '@' not in recipient_file
+                ]
 
-                else:
+                recipient_util.add(recipients)
 
-                    recipient_util.add(self.__args.recipients)
+                recipient_util.add_from_files(recipient_files)
 
             elif self.__args.remove_recip:
 
-                if self.__args.use_recip_file:
+                recipients = [
+                    recipient
+                    for recipient
+                    in self.__args.recipients
+                    if '@' in recipient
+                ]
 
-                    recipient_util.remove_from_file(self.__args.recipients[0])
+                recipient_files = [
+                    recipient_file
+                    for recipient_file
+                    in self.__args.recipients
+                    if '@' not in recipient_file
+                ]
 
-                else:
+                recipient_util.remove(recipients)
 
-                    recipient_util.remove(self.__args.recipients)
+                recipient_util.remove_from_files(recipient_files)
 
 # ========================================================================================
 
 
 def main(args):
 
-    # TESTING =================================================
+    if args.setup:
 
-    # Always check the DB first before any actions to help prevent errors
-    db_ok = DbUtil.check_db()
+        tables_created = DbUtil.create_tables()
 
-    if not db_ok:
+        if tables_created:
 
-        DbUtil.create_tables()
+            DbUtil.determine_user_props()
 
-    job_finder = JobFinder(args)
+        else:
 
-    try:
+            # Can't use the logger b/c it hasn't been set up at this stage.
+            print('Error during JobFinder Table Creation.')
 
-        job_finder.start()
+    else:
 
-    except Exception as e:
+        job_finder = JobFinder(args)
 
-        logging.getLogger().error(
-            f'''
-            There was an error during JobFinder execution:
+        # We need to know if it's safe to execute before trying to do so.
+        if job_finder.do_execute:
 
-                {str(e)}
-            '''
-        )
+            try:
 
-    # TESTING =================================================
+                job_finder.start()
 
-    # Always check the DB first before any actions to help prevent errors
-    # DbUtil.check_db()
+            except Exception as e:
 
-    # if args.setup:
+                logging.getLogger().error(
+                    f'''
+                    There was an error during JobFinder execution:
 
-    #     DbUtil.create_tables()
-
-    #     DbUtil.determine_user_props()
-
-    # else:
-
-    #     job_finder = JobFinder(args)
-
-    #     try:
-
-    #         job_finder.start()
-
-    #     except Exception as e:
-
-    #         logging.getLogger().error(
-    #             f'''
-    #             There was an error during JobFinder execution:
-
-    #                 {str(e)}
-    #             '''
-    #         )
+                        {str(e)}
+                    '''
+                )
