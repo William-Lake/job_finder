@@ -88,4 +88,3 @@ class InputUtil(object):
                         break
 
         return user_selection
-        

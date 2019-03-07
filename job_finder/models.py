@@ -1,13 +1,30 @@
-from peewee import *
+from peewee import PostgresqlDatabase
+from peewee import Model
+from peewee import CharField
+from peewee import DateField
+from peewee import IntegerField
+from peewee import TextField
+from peewee import BooleanField
+from peewee import SQL
 
-database = PostgresqlDatabase('job_finder', **{'host': '127.0.0.1', 'user': 'jobs_admin', 'password': 'jobs_admin'})
+database = PostgresqlDatabase(
+    'job_finder',
+    **{
+        'host': '127.0.0.1',
+        'user': 'jobs_admin',
+        'password': 'jobs_admin'
+    }
+)
+
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass
 
+
 class BaseModel(Model):
     class Meta:
         database = database
+
 
 class DatabaseInfo(BaseModel):
     author = CharField(null=True)
@@ -17,6 +34,7 @@ class DatabaseInfo(BaseModel):
     class Meta:
         table_name = 'database_info'
         schema = 'jobs'
+
 
 class Job(BaseModel):
     contest_num = IntegerField()
@@ -31,6 +49,7 @@ class Job(BaseModel):
         table_name = 'job'
         schema = 'jobs'
 
+
 class Prop(BaseModel):
     email = CharField()
     is_selected = BooleanField(constraints=[SQL("DEFAULT false")])
@@ -42,6 +61,7 @@ class Prop(BaseModel):
         table_name = 'prop'
         schema = 'jobs'
 
+
 class Recipient(BaseModel):
     date_added = DateField()
     email = TextField()
@@ -49,4 +69,3 @@ class Recipient(BaseModel):
     class Meta:
         table_name = 'recipient'
         schema = 'jobs'
-

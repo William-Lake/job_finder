@@ -19,7 +19,7 @@ from email.mime.text import MIMEText
 import logging
 import smtplib
 
-from db_util import DbUtil
+from .db_util import DbUtil
 from models import Recipient
 
 

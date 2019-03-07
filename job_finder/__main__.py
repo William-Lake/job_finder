@@ -51,6 +51,7 @@ def setup_logging(config_file=DEFAULT_CONFIG_FILE):
 
     #     raise e
 
+
 def gather_args():
 
     arg_parser = ArgumentParser(description='Gathers and notifies recipients about IT jobs at the State of Montana.')

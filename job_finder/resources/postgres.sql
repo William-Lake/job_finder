@@ -6,13 +6,14 @@
     License .............: GPL-3
 
     File ................: postgresql.sql
-    Description .........: Enumeration Tables for R-DaaS Project
+    Description .........: Creation script for the JobFinder project.
     Database Type .......: PostgreSQL v10 or later
     Version .............: 1.0.0
 
     Comments
     
-        TODO: Add something relevant
+        Creates the Database, Schema, and the user for managing.
+        Table generation performed by JobFinder.
 
     Tool Requirments:
 
@@ -54,7 +55,7 @@ DROP DATABASE IF EXISTS job_finder;
 -- Create New Schema
 CREATE DATABASE job_finder;
 
--- Switching to your newly created database so the following commands will work.
+-- Switching to new database so the following commands will work.
 \c job_finder;
 
 -- *****************************************************************************
@@ -69,9 +70,13 @@ CREATE DATABASE job_finder;
 -- Create New Schema
 CREATE SCHEMA jobs;
 
--- -- *****************************************************************************
--- --  ADD DATABASE INFO
--- -- *****************************************************************************
+/***************************************************
+TABLE GENERATION NOW PERFORMED VIA JobFinder.
+***************************************************/
+
+-- *****************************************************************************
+--  ADD DATABASE INFO
+-- *****************************************************************************
 
 -- --R-DaaS Informaiton Table
 -- CREATE TABLE jobs.database_info
@@ -85,9 +90,9 @@ CREATE SCHEMA jobs;
 -- INSERT INTO jobs.database_info (id, author, db_version, last_update)
 -- VALUES(1, 'Greg Beam', '1.0.0', '2019-1-6');
 
--- -- *****************************************************************************
--- --  BEGIN TABLE CREATION
--- -- *****************************************************************************
+-- *****************************************************************************
+--  BEGIN TABLE CREATION
+-- *****************************************************************************
 
 -- \echo ''
 -- \echo '==========================='
@@ -164,6 +169,8 @@ CREATE SCHEMA jobs;
 \echo 'Creating jobs_admin User'
 \echo '==========================='
 \echo ''
+
+-- NOTE: Some of these statements may seem redundant, but they're all necessary.
 
 DROP USER IF EXISTS jobs_admin;
 

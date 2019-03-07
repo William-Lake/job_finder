@@ -19,10 +19,7 @@ Manages database interactions.
 """
 import logging
 
-from peewee import OperationalError
-from peewee import ProgrammingError
-
-from input_util import InputUtil
+from .input_util import InputUtil
 from models import database
 from models import DatabaseInfo
 from models import Job
@@ -107,9 +104,6 @@ class DbUtil(object):
                 The following error was thrown when trying to connect to the database:
 
                     {str(error)}
-
-                If you haven't already, please create a PostGreSQL database and required schema.
-                The easiest way to do so is via the provided postgres.sql file.
                 '''
             )
 

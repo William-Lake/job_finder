@@ -12,6 +12,43 @@
 
 */
 
+/*
+None of these are currently used in JobFinder.
+This is for a couple of reasons:
+
+    - Views don't really work well with the PeeWee ORM. 
+    They don't throw errors/cause issues, but there is some
+    odd functionality. Here's what is happening:
+    
+        - View generated in db via this script.
+        - models.py generated via pwiz, adding View model to it.
+        - View deleted from database to test database generation.
+        - View generated via PeeWee from models outlined in models.py
+        - The result is a *table* in the database with the
+        same name as the original view, but not the view itself.
+    
+    I'm not the end-all be-all expert in the PeeWee ORM, but after
+    significant research I'm not certain this is something we
+    can get around at the moment. The table generation is
+    definitely something we'd want to use.
+
+    - The amount of logic in job_finder doesn't fully justify
+    views at the moment. It made sense previously, when we'd
+    have to create a sql statement, pass that to
+    a db management class with params, who would then manage
+    the steps in executing the sql and creating the objects.
+    However, now we're able to gather all the open jobs like so:
+
+        Job.select().where(Job.date_closed == None)
+
+    As a result, a lot of the need for views has melted away.
+    That said, there may be some future use that will make
+    having these initial views useful so I'm leaving them here
+    both out of respect for the author and in case they have 
+    a place in the future.
+*/
+
+/*
 --******************************************************************************
 -- CREATE TABLE VIEWS
 --******************************************************************************
@@ -77,3 +114,4 @@ CREATE OR REPLACE VIEW jobs.props_view AS
 
 
 -- END view creation
+*/

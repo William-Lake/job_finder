@@ -16,13 +16,11 @@
 """Main Class for finder utility."""
 
 import logging
-from logging.config import fileConfig
-import os
 
-from db_util import DbUtil
-from email_util import EmailUtil
-from job_util import JobUtil
-from recipient_util import RecipientUtil
+from util.db_util import DbUtil
+from util.email_util import EmailUtil
+from util.job_util import JobUtil
+from util.recipient_util import RecipientUtil
 
 
 class JobFinder(object):
@@ -84,16 +82,6 @@ class JobFinder(object):
         database as indicated by the user.
         '''
 
-        '''
-        Regular execution - GOOD
-        Regular Execution with no Db - GOOD
-        Add one recipient
-        Add multiple recipients
-        Remove one recipient
-        Remove multiple recipients
-        Try to both add and remove recipients
-        '''
-
         if (
             not self.__args.add_recip and
             not self.__args.remove_recip and
@@ -112,13 +100,13 @@ class JobFinder(object):
 
                 for job in saved_jobs:
 
-                    print(job.title)
+                    pass
 
                     # email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
 
                 for job in closed_jobs:
 
-                    print(job.title)
+                    pass
 
                     # email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
 
@@ -143,6 +131,8 @@ class JobFinder(object):
             raise Exception('Recipients provided with conflicting instructions! Please use the -h flag to determine what arguments to pass to job_finder.')
 
         else:
+
+            self.__logger.info('Altering Recipients')
 
             recipient_util = RecipientUtil()
 

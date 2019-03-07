@@ -23,7 +23,7 @@ class RecipientUtil(object):
 
                 recipient_emails = open(file_name).readlines()
 
-                self.add_recipients(recipient_emails)
+                self.add(recipient_emails)
 
     def add(self, recipient_emails):
 
@@ -46,7 +46,7 @@ class RecipientUtil(object):
 
                 recipient_emails = open(file_name).readlines()
 
-                self.remove_recipients(recipient_emails)
+                self.remove(recipient_emails)
 
     def remove(self, recipient_emails):
 
@@ -58,7 +58,7 @@ class RecipientUtil(object):
 
             if recipient:
 
-                Recipient.delete_instance()
+                recipient.delete_instance()
 
             else:
 
