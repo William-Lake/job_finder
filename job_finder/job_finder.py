@@ -28,6 +28,11 @@ class JobFinder(object):
     the state of montana job site.'''
 
     def __init__(self, args):
+        '''Constructor
+        
+        Arguments:
+            args {list} -- The command line arguments passed in during execution.
+        '''
 
         # TODO: Figure out how to address the user wanting to use a different password.
 
@@ -35,10 +40,8 @@ class JobFinder(object):
 
         self.__logger = logging.getLogger()
 
-        self.__setup()
-
-    def __setup(self):
-
+        # Checking the Database
+        # We want to let outside executors to know if it's ok to continue program execution after these checks.
         self.do_execute = True
 
         # Always check the DB first before any actions to help prevent errors
@@ -75,9 +78,6 @@ class JobFinder(object):
         If recipients were passed in but no direction on whether they should
         be added or removed, raise an error.
 
-        If recipients were passed in with both the --add and --remove flags,
-        raise an error.
-
         Otherwise, gather the recipients and add them to/remove them from the
         database as indicated by the user.
         '''
@@ -87,6 +87,8 @@ class JobFinder(object):
             not self.__args.remove_recip and
             not self.__args.recipients
         ):
+
+            # NORMAL JOB_FINDER EXECUTION
 
             self.__logger.debug('No args passed.')
 
@@ -100,11 +102,15 @@ class JobFinder(object):
 
                 for job in saved_jobs:
 
+                    # TODO Remove pass, uncomment email line.
+
                     pass
 
                     # email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
 
                 for job in closed_jobs:
+
+                    # TODO Remove pass, uncomment email line.
 
                     pass
 
@@ -116,65 +122,76 @@ class JobFinder(object):
             self.__args.recipients
         ):
 
+            # ERROR - RECIPIENTS W/O DIRECTION
+
             self.__logger.warning('Recipients provided but no instruction about what to do with them!')
 
             raise Exception('Recipients provided but no instruction about what to do with them! Please use the -h flag to determine what arguments to pass to job_finder.')
 
         elif (
-            self.__args.add_recip and
-            self.__args.remove_recip and
-            self.__args.recipients
+            (self.__args.add_recip or
+            self.__args.remove_recip) and
+            not self.__args.recipients
         ):
 
-            self.__logger.warning('Recipients provided with conflicting instructions!')
+            # ERROR - RECIPIENTS W/O DIRECTION
 
-            raise Exception('Recipients provided with conflicting instructions! Please use the -h flag to determine what arguments to pass to job_finder.')
+            self.__logger.warning('Recipient instructions provided without recipients to work with!')
+
+            raise Exception('Recipient instructions provided without recipients to work with! Please use the -h flag to determine what arguments to pass to job_finder.')
 
         else:
+
+            # ALTERING USERS
 
             self.__logger.info('Altering Recipients')
 
             recipient_util = RecipientUtil()
 
+            recipient_emails, recipient_files = self.__gather_recip_emails_and_files(self.__args.recipients)
+
             if self.__args.add_recip:
 
-                recipients = [
-                    recipient
-                    for recipient
-                    in self.__args.recipients
-                    if '@' in recipient
-                ]
-
-                recipient_files = [
-                    recipient_file
-                    for recipient_file
-                    in self.__args.recipients
-                    if '@' not in recipient_file
-                ]
-
-                recipient_util.add(recipients)
+                recipient_util.add(recipient_emails)
 
                 recipient_util.add_from_files(recipient_files)
 
             elif self.__args.remove_recip:
 
-                recipients = [
-                    recipient
-                    for recipient
-                    in self.__args.recipients
-                    if '@' in recipient
-                ]
-
-                recipient_files = [
-                    recipient_file
-                    for recipient_file
-                    in self.__args.recipients
-                    if '@' not in recipient_file
-                ]
-
-                recipient_util.remove(recipients)
+                recipient_util.remove(recipient_emails)
 
                 recipient_util.remove_from_files(recipient_files)
+
+    def __gather_recip_emails_and_files(self,recipients):
+        '''Separates the provided recipients into emails and .txt files.
+
+        This is necessary since Job_Finder currently allows users to pass
+        in bare emails along with .txt files containing multiple emails in
+        any order they'd like.
+        
+        Arguments:
+            recipients {list} -- The list of recipient emails/.txt files to parse.
+        
+        Returns:
+            list -- The list of bare recipient emails.
+            list -- The list of recipient email .txt files.
+        '''
+
+        recipient_emails = [
+            recipient
+            for recipient
+            in recipients
+            if '@' in recipient
+        ]
+
+        recipient_files = [
+            recipient_file
+            for recipient_file
+            in recipients
+            if '@' not in recipient_file
+        ]
+
+        return recipient_emails, recipient_files
 
 # ========================================================================================
 

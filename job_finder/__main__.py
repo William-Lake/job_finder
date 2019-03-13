@@ -62,13 +62,15 @@ def gather_args():
         help='Creates the database tables and gathers the email properties.'
     )
 
-    arg_parser.add_argument(
+    group = arg_parser.add_mutually_exclusive_group()
+
+    group.add_argument(
         '--add_recip',
         action='store_true',
         help='Whether the following recipients or recipient file should be added to the database.'
     )
 
-    arg_parser.add_argument(
+    group.add_argument(
         '--remove_recip',
         action='store_true',
         help='Whether the following recipients or recipient file should be removed from the database.'
