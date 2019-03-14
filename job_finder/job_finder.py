@@ -27,7 +27,7 @@ class JobFinder(object):
     '''Manages the process of gathering jobs from
     the state of montana job site.'''
 
-    def __init__(self, args):
+    def __init__(self):
         '''Constructor
         
         Arguments:
@@ -36,34 +36,12 @@ class JobFinder(object):
 
         # TODO: Figure out how to address the user wanting to use a different password.
 
-        self.__args = args
-
         self.__logger = logging.getLogger()
 
-        # Checking the Database
-        # We want to let outside executors to know if it's ok to continue program execution after these checks.
-        self.do_execute = True
+        self.__logger.info('JobFinder Initialized')
 
-        # Always check the DB first before any actions to help prevent errors
-        db_ok = DbUtil.check_db()
-
-        if not db_ok:
-
-            self.__logger.info('Creating JobFinder Tables.')
-
-            tables_created = DbUtil.create_tables()
-
-            if not tables_created:
-
-                self.do_execute = False
-
-                self.__logger.info('Error during JobFinder Table Creation.')
-
-            else:
-
-                self.__logger.info('JobFinder Initialized')
-
-    def start(self):
+    def start(self, args):
+        '''Starts JobFinder Execution'''
 
         '''
         We need to determine what to do based on the command line args
@@ -83,9 +61,9 @@ class JobFinder(object):
         '''
 
         if (
-            not self.__args.add_recip and
-            not self.__args.remove_recip and
-            not self.__args.recipients
+            not args.add_recip and
+            not args.remove_recip and
+            not args.recipients
         ):
 
             # NORMAL JOB_FINDER EXECUTION
@@ -117,9 +95,9 @@ class JobFinder(object):
                     # email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
 
         elif (
-            not self.__args.add_recip and
-            not self.__args.remove_recip and
-            self.__args.recipients
+            not args.add_recip and
+            not args.remove_recip and
+            args.recipients
         ):
 
             # ERROR - RECIPIENTS W/O DIRECTION
@@ -129,9 +107,11 @@ class JobFinder(object):
             raise Exception('Recipients provided but no instruction about what to do with them! Please use the -h flag to determine what arguments to pass to job_finder.')
 
         elif (
-            (self.__args.add_recip or
-            self.__args.remove_recip) and
-            not self.__args.recipients
+            (
+                args.add_recip or
+                args.remove_recip
+            ) and
+            not args.recipients
         ):
 
             # ERROR - RECIPIENTS W/O DIRECTION
@@ -148,15 +128,15 @@ class JobFinder(object):
 
             recipient_util = RecipientUtil()
 
-            recipient_emails, recipient_files = self.__gather_recip_emails_and_files(self.__args.recipients)
+            recipient_emails, recipient_files = self.__gather_recip_emails_and_files(args.recipients)
 
-            if self.__args.add_recip:
+            if args.add_recip:
 
                 recipient_util.add(recipient_emails)
 
                 recipient_util.add_from_files(recipient_files)
 
-            elif self.__args.remove_recip:
+            elif args.remove_recip:
 
                 recipient_util.remove(recipient_emails)
 
@@ -197,37 +177,66 @@ class JobFinder(object):
 
 
 def main(args):
+    '''Job_Finder Main Method
+    
+    Arguments:
+        args {NameSpace} -- The argparse.ArgumentParser NameSpace containing the Job_Finding command line arguments.
+    '''
 
-    if args.setup:
+    try:
 
-        tables_created = DbUtil.create_tables()
+        # We need to know if the user is trying to set up JobFinder.
+        if args.setup:
 
-        if tables_created:
+            # We want to first create the tables, then determine the email properties.
+            tables_created = DbUtil.create_tables()
 
-            DbUtil.determine_user_props()
+            # We only want to save email properties if the tables were created,
+            if tables_created:
+
+                DbUtil.determine_user_props()
+
+            # Otherwise we need to halt execution.
+            else:
+
+                logging.getLogger().error('Error during JobFinder Table Creation.')
 
         else:
 
-            # Can't use the logger b/c it hasn't been set up at this stage.
-            print('Error during JobFinder Table Creation.')
+            # We need to see if there's any actions that need to be taken before job_finder can be used.
+            db_action = DbUtil.check_db()
 
-    else:
+            # We need to continue taking action until JobFinder is ready to use.
+            while db_action is not None:
 
-        job_finder = JobFinder(args)
+                logging.getLogger.info(f'{db_action} must happen before execution can continue.')
 
-        # We need to know if it's safe to execute before trying to do so.
-        if job_finder.do_execute:
+                # We need to know if the action was successful so we can decide whether to break out.
+                action_successful = db_action()
 
-            try:
+                if not action_successful:
 
-                job_finder.start()
+                    logging.getLogger().error(f'Failure while performing DB Action {db_action}.')
 
-            except Exception as e:
+                    # We want to raise an exception to ensure JobFinder isn't started.
+                    raise Exception(f'Failure while performing DB Action {db_action}.')
 
-                logging.getLogger().error(
-                    f'''
-                    There was an error during JobFinder execution:
+                else:
 
-                        {str(e)}
-                    '''
-                )
+                    # We need to know if more action is needed. If not, db_action will be None.
+                    db_action = DbUtil.check_db()
+
+            # Presuming everything is ready to use, we want to start JobFinder.
+            job_finder = JobFinder()
+
+            job_finder.start(args)
+
+    except Exception as e:
+
+        logging.getLogger().error(
+            f'''
+            There was an error during JobFinder execution:
+
+                {str(e)}
+            '''
+        )

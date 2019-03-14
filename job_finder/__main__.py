@@ -53,6 +53,11 @@ def setup_logging(config_file=DEFAULT_CONFIG_FILE):
 
 
 def gather_args():
+    '''Gathers the command line arguments from the user.
+    
+    Returns:
+        argparse.NameSpace -- The user arguments, contained in the argparse NameSpace.
+    '''
 
     arg_parser = ArgumentParser(description='Gathers and notifies recipients about IT jobs at the State of Montana.')
 
@@ -86,6 +91,7 @@ def gather_args():
 
 
 if __name__ == "__main__":
+    '''Main Method'''
 
     setup_logging()
 

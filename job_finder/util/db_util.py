@@ -13,10 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""Database Util
 
-Manages database interactions.
-"""
 import logging
 
 from .input_util import InputUtil
@@ -28,90 +25,61 @@ from models import Recipient
 
 
 class DbUtil(object):
+    '''DB Utility
+    
+    Statically manages database interactions.
+    '''
 
     @staticmethod
     def check_db():
-
-        '''
-        Db Ok if:
-
-            No tables are missing
-            One of the records in the Props table is selected
-            No errors occur when making the checks.
+        '''Checks if the database is ready for use.
+        
+        Returns:
+            function -- The next DB Action to take, if there is any.
         '''
 
-        error = None
+        db_action = None
 
-        db_ok = False
+        # We first want to know if any tables are missing.
+        missing_tables = [
+            table
+            for table
+            in [DatabaseInfo, Prop, Job, Recipient]
+            if not table.table_exists()
+        ]
 
-        try:
+        if missing_tables:
 
-            # Collect any missing tables
-            missing_tables = [
-                table
-                for table
-                in [DatabaseInfo, Prop, Job, Recipient]
-                if not table.table_exists()
-            ]
+            db_action = DbUtil.create_tables
 
-            db_ok = not missing_tables
+        else:
 
-            if db_ok:
+            # Determine if there are any Prop records
+            existing_props = Prop.select()
 
-                # Determine if there are any Prop records
-                all_props = Prop.select()
+            if not existing_props:
 
-                if all_props:
+                db_action = DbUtil.determine_user_props
 
-                    # Determine if there are any selected Prop records
-                    selected_props = [
-                        prop
-                        for prop
-                        in all_props
-                        if prop.is_selected
-                    ]
+            else:
 
-                    if not selected_props:
+                # Determine if there are any selected Prop records
+                selected_props = [
+                    prop
+                    for prop
+                    in existing_props
+                    if prop.is_selected
+                ]
 
-                        error = Exception(
-                            f'''
-                            No selected records in the Prop table,
-                            which are required for sending emails to recipients.
-                            Please run job_finder with the --setup flag.
-                            '''
-                        )
+                if (len(selected_props) > 1 or not selected_props):
 
-                        db_ok = False
+                    db_action = DbUtil.determine_user_props
 
-                else:
-
-                    error = Exception(
-                        f'''
-                        No records in the Prop table,
-                        which are required for sending emails to recipients.
-                        Please run job_finder with the --setup flag.
-                        '''
-                    )
-
-        except Exception as e:
-
-            error = e
-
-        if error:
-
-            raise Exception(
-                f'''
-                The following error was thrown when trying to connect to the database:
-
-                    {str(error)}
-                '''
-            )
-
-        return db_ok
+        return db_action
 
     @staticmethod
     def create_tables():
-        """Check Database Connection"""
+        '''Creates the tables in the database.'''
 
         tables_created = True
 
@@ -167,11 +135,14 @@ class DbUtil(object):
 
     @staticmethod
     def get_props():
-        """Returns Array[1:4] Props for Emailer
-
-        Returns
-            smtp[1], port[2], email[3] and pword[4]
-        """
+        '''Provides the selected Property in the Props table.
+        
+        Raises:
+            Exception -- Raised if there isn't a selected property in the Prop table.
+        
+        Returns:
+            Prop -- The selected property.
+        '''
 
         prop = Prop.get_or_none(Prop.is_selected == True)
 
@@ -188,81 +159,105 @@ class DbUtil(object):
     @staticmethod
     def determine_user_props():
 
-        existing_props = Prop.select()
+        props_determined = True
 
-        '''
-        If there's already properties
-            Ask the user if they want to use an existing one
-                If so, let them choose
-                if not, give them the option to create a new one
-            Otherwise give them the option to createa  new one
-        '''
+        try:
 
-        if existing_props:
+            existing_props = Prop.select()
 
-            use_existing = InputUtil.gather_boolean_input(
-                f'There are {len(existing_props)} properties in the database already. Would you like to use one of them?',
-                true_option='Y',
-                false_option='N'
-            )
+            '''
+            If there's already properties
+                Ask the user if they want to use an existing one
+                    If so, let them choose
+                    if not, give them the option to create a new one
+                Otherwise give them the option to createa  new one
+            '''
 
-            if use_existing:
+            if existing_props:
 
-                prop_options = {}
+                use_existing = InputUtil.gather_boolean_input(
+                    f'There are {len(existing_props)} properties in the database already. Would you like to use one of them?',
+                    true_option='Y',
+                    false_option='N'
+                )
 
-                for prop in existing_props:
+                if use_existing:
 
-                    prop.is_selected = False
+                    prop_options = {}
 
-                    prop.save()
+                    for prop in existing_props:
 
-                    prop_options[prop.email] = prop
+                        prop.is_selected = False
 
-                prop_selection = InputUtil.gather_selection_input(prop_options)
+                        prop.save()
 
-                prop_selection.is_selected = True
+                        prop_options[prop.email] = prop
 
-                prop_selection.save()
+                    prop_selection = InputUtil.gather_selection_input(prop_options)
+
+                    prop_selection.is_selected = True
+
+                    prop_selection.save()
+
+                else:
+
+                    props_determined = DbUtil.gather_user_props()
 
             else:
 
-                DbUtil.gather_user_props()
+                props_determined = DbUtil.gather_user_props()
 
-        else:
+        except Exception as e:
 
-            DbUtil.gather_user_props()
+            logging.getLogger().error(e)
+
+            props_determined = False
+
+        return props_determined
 
     @staticmethod
     def gather_user_props():
 
-        prop = Prop()
+        props_gathered = True
 
-        for item in ['SMTP', 'PORT', 'EMAIL', 'PASS']:
+        try:
 
-            prompt = f'{item}?'
+            prop = Prop()
 
-            user_input = (
-                InputUtil.gather_input(prompt)
-                if item != 'PASS'
-                else InputUtil.gather_input(prompt, is_password=True)
-            )
+            for item in ['SMTP', 'PORT', 'EMAIL', 'PASS']:
 
-            if item == 'SMTP':
+                prompt = f'{item}?'
 
-                prop.smtp = user_input
+                user_input = (
+                    InputUtil.gather_input(prompt)
+                    if item != 'PASS'
+                    else InputUtil.gather_input(prompt, is_password=True)
+                )
 
-            elif item == 'PORT':
+                if item == 'SMTP':
 
-                prop.port = user_input
+                    prop.smtp = user_input
 
-            elif item == 'EMAIL':
+                elif item == 'PORT':
 
-                prop.email = user_input
+                    prop.port = user_input
 
-            else:
+                elif item == 'EMAIL':
 
-                prop.pword = user_input
+                    prop.email = user_input
 
-        prop.is_selected = True
+                else:
 
-        prop.save()
+                    prop.pword = user_input
+
+            prop.is_selected = True
+
+            prop.save()
+
+        except Exception as e:
+
+            logging.getLogger().error(e)
+
+            props_gathered = False
+
+        return props_gathered
