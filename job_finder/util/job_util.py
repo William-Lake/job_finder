@@ -22,6 +22,7 @@ from models import Job
 
 
 class JobUtil(object):
+    '''Performs the common Job related functions.'''
 
     def __init__(self):
         """Constructor"""

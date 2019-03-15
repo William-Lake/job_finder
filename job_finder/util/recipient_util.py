@@ -6,26 +6,32 @@ from models import Recipient
 
 
 class RecipientUtil(object):
-
+    '''Performs common Recipient related actions.'''
+    
     def __init__(self):
+        '''Constructor'''
 
         self.__logger = logging.getLogger()
 
         self.__logger.info('RecipientUtil Initialized')
 
     def add_from_files(self, file_names):
+        '''Adds all the recipients in the files contained in the given list.
+        
+        Arguments:
+            file_names {list} -- A list of filenames, each containing recipient emails to save.
+        '''
 
-        for file_name in file_names:
+        recipient_emails = self.__gather_emails_from_files(file_names)
 
-            if self.__file_ok(file_name):
-
-                self.__logger.info(f'Adding Recipients in {file_name}.')
-
-                recipient_emails = open(file_name).readlines()
-
-                self.add(recipient_emails)
+        self.add(recipient_emails)
 
     def add(self, recipient_emails):
+        '''Adds all the recipient in the given list to the database.
+        
+        Arguments:
+            recipient_emails {list} -- The list of recipient emails.
+        '''
 
         self.__logger.info(f'Adding {len(recipient_emails)} recipients.')
 
@@ -37,19 +43,21 @@ class RecipientUtil(object):
             )
 
     def remove_from_files(self, file_names):
+        '''Removes all the recipients in the files contained in the given list.
+        
+        Arguments:
+            file_names {list} -- A list of filenames, each containing recipient emails to remove.
+        '''
+        recipient_emails = self.__gather_emails_from_files(file_names)
 
-        for file_name in file_names:
-
-            if self.__file_ok(file_name):
-
-                self.__logger.info(f'Removing Recipients in {file_name}.')
-
-                recipient_emails = open(file_name).readlines()
-
-                self.remove(recipient_emails)
+        self.remove(recipient_emails)
 
     def remove(self, recipient_emails):
-
+        '''Removes all the recipient in the given list from the database.
+        
+        Arguments:
+            recipient_emails {list} -- The list of recipient emails.
+        '''
         self.__logger.info(f'Removing {len(recipient_emails)} recipients.')
 
         for email in recipient_emails:
@@ -66,22 +74,36 @@ class RecipientUtil(object):
                     f'Recipient {email} was not in the database.'
                 )
 
-    def __file_ok(self, file_name):
+    def __gather_emails_from_files(self,file_names):
+        '''Gathers all the emails from all the given list of files.
+        
+        Arguments:
+            file_names {list} -- The list of file_names to gather emails from.
+        
+        Returns:
+            list -- The list of recipient emails gathered from the listed files.
+        '''
 
-        file_name = file_name.strip()
+        recipient_emails = []
 
-        file_ok = True
+        for file_name in file_names:
 
-        if not os.path.exists(file_name):
+            file_name = file_name.strip()
 
-            self.__logger.error(f"{file_name} doesn't exist!")
+            # We want to make sure the file exists and is a .txt file.
+            if (
+                os.path.exists(file_name) and
+                file_name.endswith('.txt')
+            ):
 
-            file_ok = False
+                for email in open(file_name).readlines():
 
-        if not file_name.endswith('.txt'):
+                    email = email.strip()
 
-            self.__logger.error(f"{file_name} isn't a .txt file!")
+                    recipient_emails.append(email)
 
-            file_ok = False
+            else:
 
-        return file_ok
+                self.__logger.error(f"{file_name} either doesn't exist or isn't a .txt file!")
+
+        return recipient_emails

@@ -2,12 +2,25 @@ from getpass import getpass
 
 
 class InputUtil(object):
+    '''Performs common Input actions.'''
 
     @staticmethod
     def gather_input(prompt, is_password=False):
+        '''Gathers user input.
+        
+        Arguments:
+            prompt {str} -- The prompt to use when gathering user input.
+        
+        Keyword Arguments:
+            is_password {bool} -- If True, a password is being gathered and getpass should be used. (default: {False})
+        
+        Returns:
+            str -- The gathered user input.
+        '''
 
         user_input = None
 
+        # We want to continue attempting to gather info until the user provides some.
         while True:
 
             if is_password:
@@ -26,6 +39,16 @@ class InputUtil(object):
     
     @staticmethod
     def gather_boolean_input(prompt, true_option, false_option):
+        '''Gathers a boolean from the user.
+        
+        Arguments:
+            prompt {str} -- The prompt to use when gathering user input.
+            true_option {str} -- The user input that represents True.
+            false_option {str} -- The user input that represents False.
+        
+        Returns:
+            bool -- The boolean user input.
+        '''
 
         user_input = None
 
@@ -43,11 +66,17 @@ class InputUtil(object):
 
                 if user_input.upper() == true_option.upper():
 
-                    return True
+                    user_input = True
+
+                    break
 
                 if user_input.upper() == false_option.upper():
 
-                    return False
+                    user_input = False
+
+                    break
+
+        return user_input
 
     @staticmethod
     def gather_selection_input(selection_dict):

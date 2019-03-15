@@ -85,6 +85,7 @@ class DbUtil(object):
 
         try:
 
+            # We want to know what tables we need to create.
             missing_tables = [
                 table
                 for table
@@ -92,38 +93,7 @@ class DbUtil(object):
                 if not table.table_exists()
             ]
 
-            existing_tables = [
-                table
-                for table
-                in [DatabaseInfo, Prop, Job, Recipient]
-                if table not in missing_tables
-            ]
-
-            if 0 < len(missing_tables) and len(missing_tables) < 5:
-
-                for table in existing_tables:
-
-                    if table.select():
-
-                        # TODO: Improve this message.
-                        raise Exception(
-                            '''
-                            Some, but not all of the required tables exist.
-                            Some of the existing tables contain records.
-                            The database is only partially formed.
-                            Please backup the data you'd like to keep,
-                            delete the existing tables then try again.
-                            '''
-                        )
-
-            database.create_tables(
-                [
-                    DatabaseInfo,
-                    Job,
-                    Recipient,
-                    Prop
-                ]
-            )
+            database.create_tables(missing_tables)
 
         except Exception as e:
 
@@ -144,6 +114,7 @@ class DbUtil(object):
             Prop -- The selected property.
         '''
 
+        # We only want the selected Property.
         prop = Prop.get_or_none(Prop.is_selected == True)
 
         if prop:
@@ -158,6 +129,11 @@ class DbUtil(object):
 
     @staticmethod
     def determine_user_props():
+        '''Determines which user property in the database to use.
+        
+        Returns:
+            bool -- True if the process was completed/successful.
+        '''
 
         props_determined = True
 
@@ -170,9 +146,10 @@ class DbUtil(object):
                 Ask the user if they want to use an existing one
                     If so, let them choose
                     if not, give them the option to create a new one
-                Otherwise give them the option to createa  new one
+                Otherwise give them the option to create a new one
             '''
 
+            # If there's already properties in the database, we want to let the user know and let them decide which one- if any -to use.
             if existing_props:
 
                 use_existing = InputUtil.gather_boolean_input(
@@ -185,6 +162,12 @@ class DbUtil(object):
 
                     prop_options = {}
 
+                    '''
+                    We want a dict where the keys are the property's email,
+                    and the values are the Property objects,
+                    so the InputUtil can use them to determine the user's 
+                    Property selection.
+                    '''
                     for prop in existing_props:
 
                         prop.is_selected = False
@@ -200,11 +183,13 @@ class DbUtil(object):
                     prop_selection.save()
 
                 else:
-
+                    
+                    # We want to get data from the user for a new set of Properties.
                     props_determined = DbUtil.gather_user_props()
 
             else:
 
+                # We want to get data from the user for a new set of Properties.
                 props_determined = DbUtil.gather_user_props()
 
         except Exception as e:
@@ -217,6 +202,11 @@ class DbUtil(object):
 
     @staticmethod
     def gather_user_props():
+        '''Gathers values from the user and stores them as a Property.
+
+        Returns:
+            bool -- True if the process was successful.
+        '''
 
         props_gathered = True
 
@@ -224,6 +214,7 @@ class DbUtil(object):
 
             prop = Prop()
 
+            # We to collect each item that makes up a Property.
             for item in ['SMTP', 'PORT', 'EMAIL', 'PASS']:
 
                 prompt = f'{item}?'
