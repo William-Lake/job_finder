@@ -13,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-"""Emails recipients about new jobs."""
 
 from email.mime.text import MIMEText
 import logging
@@ -24,6 +23,7 @@ from models import Recipient
 
 
 class EmailUtil(object):
+    '''Performs common Email related tasks.'''
 
     OPENED = 'NEW JOB\n'
 

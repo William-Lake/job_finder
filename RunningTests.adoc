@@ -1,0 +1,35 @@
+= Running Tests
+:source-highlighter: coderay
+
+== Building Test Classes
+
+_All test classes go in the tests directory._
+
+=== Naming Convention
+
+* All test files have the `test_` prefix.
+* All methods in the test files have the `test_` prefix.
+
+=== Structure
+
+* `import unittest`
+* Class extends `unittest.TestCase`
+* All methods take only one param- `self`.
+
+=== Asserting
+
+https://kapeli.com/cheat_sheets/Python_unittest_Assertions.docset/Contents/Resources/Documents/index
+
+== Usage
+
+[source]
+----
+python -m unittest TESTS_SUBDIR.NAME_OF_TEST_CLASS
+----
+
+E.g.
+
+[source]
+----
+python -m unittest tests.test_input_util
+----

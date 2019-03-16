@@ -38,51 +38,67 @@ class InputUtil(object):
         return user_input
     
     @staticmethod
-    def gather_boolean_input(prompt, true_option, false_option):
-        '''Gathers a boolean from the user.
+    def gather_boolean_input(prompt):
+        '''Gathers yes/no input from the user.
         
         Arguments:
-            prompt {str} -- The prompt to use when gathering user input.
-            true_option {str} -- The user input that represents True.
-            false_option {str} -- The user input that represents False.
+            prompt {str} -- The prompt to provide the user.
         
         Returns:
-            bool -- The boolean user input.
+            bool -- True if the user answers Yes.
         '''
 
         user_input = None
 
+        # We want to continue until we have some valid input.
         while True:
 
-            user_input = input(
-                f'''
-                {prompt}
+            # We want to show them their options, and normalize their input.
 
-                Options: {true_option} / {false_option}
-                '''
-            ).strip()
+            user_input = input(f'{user_input} [Y/N]').strip().upper()[0]
 
-            if user_input:
+            if (
+                user_input and
+                user_input in ['Y','N']
+            ):
 
-                if user_input.upper() == true_option.upper():
+                user_input = (
+                    True
+                    if user_input == 'Y'
+                    else False
+                )
 
-                    user_input = True
-
-                    break
-
-                if user_input.upper() == false_option.upper():
-
-                    user_input = False
-
-                    break
+                break
 
         return user_input
 
     @staticmethod
     def gather_selection_input(selection_dict):
+        '''Gathers a user's input from a selection of options, returning the associated object in the provided dict.
+        
+        Arguments:
+            selection_dict {dict} -- The dictionary of selections, key is the option to show the user and the value is the object to return if it's selected. 
+        
+        Returns:
+            object -- The object in the selection_dict associated with the option the user selected.
+        '''
 
         user_selection = None
 
+        '''
+        We want to normalize the options so we can
+        make accurate comparisons with the user input.
+        '''
+        normalized_selections = dict(
+            (
+                selection.upper(),
+                result
+            )
+            for selection, result
+            in selection_dict.items()
+        )
+
+        # We want to continue until we have some valid input.
         while True:
 
             print('Please make a selection from the following:')
@@ -91,29 +107,50 @@ class InputUtil(object):
 
                 print(f'{key_index + 1}) {key}')
 
-            user_input = input('?').strip()
+            user_input = input('?').strip().upper()
 
             if user_input:
 
+                '''
+                We want to give the user the option to
+                provide either the index of the selection
+                or the selection itself.
+                '''
                 try:
-
+                    
+                    # We want to check if the user provided an index value.
                     user_input = int(user_input)
 
+                    # We want to make sure the user_input matches the 0-based index of the keys list.
+                    user_input -= 1
+
+                    # We want to make sure the user input is in the appropriate range.
                     if (
-                        user_input > 0 and
-                            user_input <= len(selection_dict)
+                        user_input >= 0 and
+                        user_input < len(selection_dict)
                     ):
 
-                        user_selection = list(selection_dict.values())[user_input - 1]
+                        user_selection = list(selection_dict.values())[user_input]
 
                         break
 
+                # Caught if the user input isn't an index value.
                 except Exception as e:
 
-                    if user_input.upper() in selection_dict.keys():
+                    # We want to make sure the user input is one of the available selections.
+                    if user_input in normalized_selections.keys():
 
-                        user_selection = selection_dict[user_input]
+                        user_selection = normalized_selections[user_input]
 
                         break
+            
+            '''
+            If the process hasn't broken out at this point,
+            it's due to invalid input from the user.
+            We want to let them know.
+            '''
+            print('Please provide an appropriate selection.')
 
         return user_selection
+
+

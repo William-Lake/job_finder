@@ -152,11 +152,7 @@ class DbUtil(object):
             # If there's already properties in the database, we want to let the user know and let them decide which one- if any -to use.
             if existing_props:
 
-                use_existing = InputUtil.gather_boolean_input(
-                    f'There are {len(existing_props)} properties in the database already. Would you like to use one of them?',
-                    true_option='Y',
-                    false_option='N'
-                )
+                use_existing = InputUtil.gather_boolean_input(f'There are {len(existing_props)} properties in the database already. Would you like to use one of them?')
 
                 if use_existing:
 
