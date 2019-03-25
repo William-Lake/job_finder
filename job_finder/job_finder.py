@@ -80,19 +80,11 @@ class JobFinder(object):
 
                 for job in saved_jobs:
 
-                    # TODO Remove pass, uncomment email line.
-
-                    pass
-
-                    # email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
+                    email_util.notify_recipients_of_job(job, EmailUtil.OPENED)
 
                 for job in closed_jobs:
 
-                    # TODO Remove pass, uncomment email line.
-
-                    pass
-
-                    # email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
+                    email_util.notify_recipients_of_job(job, EmailUtil.CLOSED)
 
         elif (
             not args.add_recip and

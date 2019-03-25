@@ -40,9 +40,13 @@ job if one appears. Job data gathered from the State of Montana's
 
 ## Requirements
 
-[Job Finder][] was built using Python >= 3.5, 3.6, 3.7; tested on Ubuntu 18.04
-and Windows 10 using [Anaconda Python](https://conda.io/docs/) virtual
-environments. For a full list of modules used, see [requirements.txt][]
+* Python >= 3.5
+* OS - Tested on:
+    * Ubuntu 18.04
+    * Windows 10
+* Postgresql Database (Written with 11)
+    * (Ubuntu Install)[https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04]
+    * (Windows Install)[https://www.postgresql.org/download/windows/]
 
 ## Installation
 
@@ -51,58 +55,36 @@ environments. For a full list of modules used, see [requirements.txt][]
 > will be used rather than the `-e .` convention. Likewise, there will be no
 > need to clone the repository beforehand.
 
-A `Makefile` exists for both Windows and Linux | Posix systems. The help message
-may look slightly different on each system, however, the commands are identical
-for both.
+### Python
 
-```bash
-----------------------------------------
- Job Finder Make Help
-----------------------------------------
+* Language
+    * (https://www.python.org/downloads/windows/)[Windows Installer]
+    * (https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-programming-environment-on-ubuntu-18-04-quickstart)[Ubuntu Install]
+* Virtual Environment (Optional)
+    * (VirtualEnv)[https://virtualenv.pypa.io/en/latest/]
+    * (Anaconda)[https://www.anaconda.com/]
+    * (Miniconda)[https://docs.conda.io/en/latest/miniconda.html]
+* Dependencies
+    * All the required modules are outlined in requirements.txt file, and can be installed via pip:
 
- The build script takes one option:
+`pip install -r requirements.txt`
 
-   make <option>
+### Database
 
-   clean      :  clean the build tree
-   distclean  :  clean distribution files adn folders
-   dist       :  generate distribution wheel
-   install    :  install the application locally
-   uninstall  :  uninstall the application
-   pubtest    :  publish app to test.pypi.org
-   publish    :  publish app to pypi.org
-   setup      :  pip install requirements.txt
-   setupdev   :  pip install requirements-dev.txt
+* If you haven't already, download and install Postgresql.
+    * (Ubuntu Install)[https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04]
+    * (Windows Install)[https://www.postgresql.org/download/windows/]
+* Once installed, you'll need to perform some minor database setup. The required changes are outlined in the script job_finder\resources\postgres.sql which can be ran to implement the changes.
+    * E.g. `sudo -u postgres psql < job_finder/resources/postgres.sql`
+    * TODO: Need the equivalent command and/or instructions for Windows.
 
-   Example:
-     make setup
-     make clean
-     make install
-```
+### Initial Setup
 
-1. Open a Command Line/Terminal Session
-1. Change directories to a sutable location and checkout the repository
+Before it can be used JobFinder needs to create its tables and gather some info needed for sending emails. The process can be started by using the `--setup` flag:
 
-    ```bash
-    git clone https://www.github.com/William-Lake/job_finder.git
-    ```
+`python job_finder --setup`
 
-1. Change directories to `job_finder` and install dependencies
-
-    ```bash
-    # Install Dependencies in your Virtual Environment
-
-    cd job_finder
-    make setup
-    ```
-
-1. Add a recipient to initialize the the database.
-
-    ```bash
-    # Note: change email address to the desired recipient.
-
-    jobfinder ADD email@nowhere.com
-    ```
+You will be prompted for the smtp, port, email, and password.
 
 ## Usage
 
@@ -120,43 +102,23 @@ The `jobfinder` script provides three main functions:
 
 ### Add Recipient
 
-To add a new recipient you would execute the `jobfinder` script, passing in the
-`ADD` keyword followed by the recipient's email address, like so:
+Adding recipients is performed via the --add_recip flag:
 
 ```bash
-# Add a single recipient to the database
-
-jobfinder ADD test@email.com
+python job_finder --add_recip test_recip@gmail.com list_of_recips.txt second_recip@mail.com
 ```
 
-You can also add a list of recipients, however they need to be in a `*.txt` file
-with *One Recipient per Line*.
-
-```bash
-# Add a list of recipients to the database using a file
-
-jobfinder ADD recipients_to_add.txt
-```
+Notice that both email addresses and .txt files can be provided. The order doesn't matter, they can be intermixed. However, the text files must contain one email per line.
 
 ### Remove Recipient
 
-To remove a recipient you would execute the `jobfinder` script, passing in the
-`REMOVE` keyword followed by the recipient's email address, like so:
+Removing recipients is performed via the `--remove_recip` flag:
 
 ```bash
-# Remove recipient form the database
-
-jobfinder REMOVE test@email.com
+python job_finder --remove_recip test_recip@gmail.com list_of_recips.txt second_recip@mail.com
 ```
 
-You can also remove a list of recipients, however, they need to be in a `*.txt`
-file with *One Recipient per Line*.
-
-```bash
-# Remove a list of recipients from database using a file
-
-jobfinder ADD recipients_to_remove.txt
-```
+Notice that both email addresses and .txt files can be provided. The order doesn't matter, they can be intermixed. However, the text files must contain one email per line.
 
 ### Gather Jobs
 
@@ -166,47 +128,8 @@ script with no arguments:
 ```bash
 # Launch jobfinder to parse jobs, and email recipients
 
-jobfinder
+python jobfinder
 ```
-
-### Notifying Recipients
-
-`jobfinder` uses `email` to notify recipients of jobs that have either
-closed or opened recently.
-
-In order to do so, `email` needs a useable email address and password,
-as well as smtp and port info. This information is stored in a  database table
-named `jobfinder.db` for SQLite3, and in a Schema named `jobs` in
-the default `PostgreSQL` installation.
-
-Access to the SQLite3 Database can be found at the following locations:
-
-```bash
-For Windows
-
-C:\Users\%username%\AppData\Local\jobfinder\jobfinder.db
-
-For Linux | MacOSX
-$HOME/.local/share/jobfinder/jobfinder.db
-```
-
-The data required for the `props` table (SQLite | PostgreSQL) is as follows:
-
-```bash
-SMTP=test.server.net
-PORT=1234
-EMAIL=email@test.net
-PASSWORD=password
-```
-
->NOTE: Your password will be in plain text. This is not secure and will
->be addressed in future iterations.** Additionally, `emailer` has only been
->tested with one email and may not work with others.
-
-## Database
-
-The database used for this project (currently) is sqlite. The included
-`sqlite.sql` script shows the current database structure.
 
 ## Moving Forward
 

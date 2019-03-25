@@ -55,7 +55,7 @@ class InputUtil(object):
 
             # We want to show them their options, and normalize their input.
 
-            user_input = input(f'{user_input} [Y/N]').strip().upper()[0]
+            user_input = input(f'{prompt} [Y/N]').strip().upper()[0]
 
             if (
                 user_input and
