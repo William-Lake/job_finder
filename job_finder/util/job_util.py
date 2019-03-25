@@ -40,9 +40,9 @@ class JobUtil(object):
 
         self.__gather_jobs_on_site()
 
-        self.__save_jobs()
-
         self.__close_jobs()
+
+        self.__save_jobs()
 
         return self.__saved_jobs, self.__closed_jobs
 
